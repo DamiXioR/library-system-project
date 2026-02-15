@@ -5,33 +5,35 @@ project(MyProgram)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# --- Program ---
-file(GLOB_RECURSE SRC_FILES "product/src/*.cpp")
-
-add_executable(MyProgram
-    main.cpp
-    ${SRC_FILES}
+# --- Data module (library) ---
+add_library(DataModule SHARED
+    DataModule/src/Data.cpp
+)
+target_include_directories(DataModule PUBLIC
+    DataModule/include
 )
 
-target_include_directories(MyProgram PRIVATE
-    product/include/
+# --- Program ---
+add_executable(MyProgram main.cpp)
+
+target_link_libraries(MyProgram PRIVATE
+    DataModule
 )
 
 # --- Tests  ---
 enable_testing()
 
-file(GLOB_RECURSE TEST_SRC_FILES "unittests/*.cpp")
+file(GLOB_RECURSE TEST_SRC_FILES "DataModule/unittests/*.cpp")
 
 add_executable(MyTests
-    ${SRC_FILES}
     ${TEST_SRC_FILES}
 )
 
-target_include_directories(MyTests PRIVATE
-    product/include/
+target_link_libraries(MyTests PRIVATE
+    DataModule
 )
 
-# ---- GTest ----
+# > GTest
 set(GTEST_ROOT  /home/dmx/workspace/good_job_project/googletest)
 
 target_include_directories(MyTests PRIVATE
