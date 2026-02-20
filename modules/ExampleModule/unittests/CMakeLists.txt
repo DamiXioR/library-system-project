@@ -1,4 +1,4 @@
-# --- Unittests fro Data module ---
+# --- Unittests for ExampleModule ---
 
 file(GLOB_RECURSE TEST_SRC_FILES "*.cpp")
 
