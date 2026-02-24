@@ -30,7 +30,7 @@ Add CMake binaries to your environment variables:
 `export PATH=$PATH:/home/${USER}/good_job_project/cmake-4.2.3-linux-x86_64/bin`
 This is important if you want to run CMake using the command `cmake` instead of specifying the full path.
 
-## GTest and GMock
+## GTest and GMock [Section should be updated due to change an approach]
 Build googletest framework locally. The project uses GTest and GMock shared libraries.
 
 ```bash
@@ -117,3 +117,33 @@ If you do not need to configure specific unit tests, you can exclude them from t
 cmake -S . -B build -DBUILD_EXAMPLEMODULE_TESTS=OFF
 ```
 You can also specify multiple flags in the same command.
+
+## Debugging and Dynamic Analysis
+
+For debugging and dynamic analysis the project should be built **without compiler optimizations and with debug symbols enabled**.
+If the project is compiled with optimizations (e.g. Release mode), debuggers may behave unpredictably and tools such as Valgrind may not report the **exact source line where an error occurs**.
+
+Therefore the project should be configured in **Debug mode**, which enables debug flags (e.g. `-g`) and disables aggressive optimizations.
+
+### Build configuration
+
+Configure the project with CMake:
+
+```bash
+cd ~/workspace/good_job_project/
+cmake -DCMAKE_BUILD_TYPE=Debug -S . -B build
+```
+
+Build the project:
+
+```bash
+cmake --build build
+```
+
+### Running memory checks
+
+Run tests with Valgrind through CTest:
+
+```bash
+ctest --test-dir build -T memcheck
+```

@@ -1,4 +1,4 @@
-# --- Unittests for UtilitiesModule ---
+# --- Unittests for Utilities ---
 
 file(GLOB_RECURSE TEST_SRC_FILES "*.cpp")
 
@@ -7,11 +7,8 @@ add_executable(UtilitiesTests
 )
 
 target_link_libraries(UtilitiesTests PRIVATE
-    UtilitiesModule
-    GTest::gtest
-    GTest::gtest_main
-    GTest::gmock
-    GTest::gmock_main
+    GTestDependencies
+    Utilities
 )
 
 add_test(
