@@ -18,7 +18,7 @@ public:
         m_bookId = std::move(other.m_bookId);
         return *this;
     }
-    
+
     bool operator==(const BookId& other) const {
         return m_bookId == other.m_bookId;
     }

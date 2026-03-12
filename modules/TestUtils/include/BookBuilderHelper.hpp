@@ -13,6 +13,7 @@ private:
     BookId m_id{"123-456-789-101112"};
     std::string m_title{"Default Title"};
     std::string m_author{"Default Author"};
+    uint16_t m_publicationYear{966};
 
 public:
     BookBuilder& withId(BookId id) {
@@ -30,21 +31,30 @@ public:
         return *this;
     }
 
+    BookBuilder& withPublicationYear(uint16_t pYear) {
+        m_publicationYear = std::move(pYear);
+        return *this;
+    }
+
     Book build() const {
-        return Book(m_id, m_author, m_title);
+        Book book = Book(m_id, m_author, m_title);
+        book.setPublicationYear(m_publicationYear);
+        return book;
     }
 
     Book createDziady() {
-        return withId(BookId{*UuidGenerator<BookId>::createUuid()})
-            .withAuthor("Adam Mickiewicz")
-            .withTitle("Dziady")
-            .build();
+    return withId(BookId{*UuidGenerator<BookId>::createUuid()})
+        .withAuthor("Adam Mickiewicz")
+        .withTitle("Dziady")
+        .withPublicationYear(1823)
+        .build();
     }
 
     Book createHyperion() {
         return withId(BookId{*UuidGenerator<BookId>::createUuid()})
             .withAuthor("Dan Simmons")
             .withTitle("Hyperion")
+            .withPublicationYear(1989)
             .build();
     }
 
@@ -52,6 +62,7 @@ public:
         return withId(BookId{*UuidGenerator<BookId>::createUuid()})
             .withAuthor("Andrzej Sapkowski")
             .withTitle("Wiedźmin. Ostatnie życzenie")
+            .withPublicationYear(1993)
             .build();
     }
 
@@ -59,6 +70,7 @@ public:
         return withId(BookId{*UuidGenerator<BookId>::createUuid()})
             .withAuthor("Andrzej Sapkowski")
             .withTitle("Wiedźmin. Miecz Przeznaczenia.")
+            .withPublicationYear(1992)
             .build();
     }
 
@@ -66,6 +78,7 @@ public:
         return withId(BookId{*UuidGenerator<BookId>::createUuid()})
             .withAuthor("George Orwell")
             .withTitle("1984")
+            .withPublicationYear(1949)
             .build();
     }
 
@@ -73,6 +86,7 @@ public:
         return withId(BookId{*UuidGenerator<BookId>::createUuid()})
             .withAuthor("J. R. R. Tolkien")
             .withTitle("The Hobbit")
+            .withPublicationYear(1937)
             .build();
     }
 
@@ -80,6 +94,7 @@ public:
         return withId(BookId{*UuidGenerator<BookId>::createUuid()})
             .withAuthor("J. R. R. Tolkien")
             .withTitle("The Lord of the Rings")
+            .withPublicationYear(1954)
             .build();
     }
 
@@ -87,6 +102,7 @@ public:
         return withId(BookId{*UuidGenerator<BookId>::createUuid()})
             .withAuthor("Stanisław Lem")
             .withTitle("Solaris")
+            .withPublicationYear(1961)
             .build();
     }
 
@@ -94,6 +110,7 @@ public:
         return withId(BookId{*UuidGenerator<BookId>::createUuid()})
             .withAuthor("Stanisław Lem")
             .withTitle("Cyberiada")
+            .withPublicationYear(1965)
             .build();
     }
 

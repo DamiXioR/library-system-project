@@ -46,4 +46,9 @@ TEST_F(BookTests, SetBookFields) {
   book.setTitle(correctedTitle);
   ASSERT_EQ(book.getTitle(), correctedTitle);
   ASSERT_EQ(book.getAuthor(), correctedAuthor);
+
+  const uint16_t pYear = 2000;
+  ASSERT_EQ(book.getPublicationYear(), std::nullopt);
+  book.setPublicationYear(pYear);
+  ASSERT_EQ(book.getPublicationYear(), pYear);
 }

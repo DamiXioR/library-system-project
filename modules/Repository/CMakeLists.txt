@@ -2,6 +2,7 @@
 
 add_library(Repository SHARED
     src/BookRepository.cpp
+    src/MultiIndexedContainer.cpp
 )
 
 target_include_directories(Repository PUBLIC
