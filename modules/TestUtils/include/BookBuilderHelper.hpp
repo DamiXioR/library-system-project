@@ -5,6 +5,7 @@
 #include "BookId.hpp"
 #include "UuidGenerator.hpp"
 #include <vector>
+#include <string>
 
 namespace BookHelpers {
 
@@ -57,21 +58,49 @@ public:
             .withPublicationYear(1989)
             .build();
     }
-
-    Book createWiedzminOstatnieZyczenie() {
-        return withId(BookId{*UuidGenerator<BookId>::createUuid()})
-            .withAuthor("Andrzej Sapkowski")
-            .withTitle("Wiedźmin. Ostatnie życzenie")
-            .withPublicationYear(1993)
-            .build();
+    
+    Book createWitcherTheLastWish() {
+        return createAndrzejSapkowskiBook("The Witcher: The Last Wish", 1993);
     }
 
-    Book createWiedzminMieczPrzeznaczenia() {
-        return withId(BookId{*UuidGenerator<BookId>::createUuid()})
-            .withAuthor("Andrzej Sapkowski")
-            .withTitle("Wiedźmin. Miecz Przeznaczenia.")
-            .withPublicationYear(1992)
-            .build();
+    Book createWitcherSwordOfDestiny() {
+        return createAndrzejSapkowskiBook("The Witcher: Sword of Destiny", 1992);
+    }
+
+    Book createWitcherBloodOfElves() {
+        return createAndrzejSapkowskiBook("The Witcher: Blood of Elves", 1994);
+    }
+
+    Book createWitcherTimeOfContempt() {
+        return createAndrzejSapkowskiBook("The Witcher: Time of Contempt", 1995);
+    }
+
+    Book createWitcherBaptismOfFire() {
+        return createAndrzejSapkowskiBook("The Witcher: Baptism of Fire", 1996);
+    }
+
+    Book createWitcherTowerOfSwallows() {
+        return createAndrzejSapkowskiBook("The Witcher: The Tower of the Swallow", 1997);
+    }
+
+    Book createWitcherLadyOfTheLake() {
+        return createAndrzejSapkowskiBook("The Witcher: The Lady of the Lake", 1999);
+    }
+
+    Book createWitcherSeasonOfStorms() {
+        return createAndrzejSapkowskiBook("The Witcher: Season of Storms", 2013);
+    }
+
+    Book createQuoVadis() {
+        return createHenrykSienkiewiczBook("Quo Vadis", 1896);
+    }
+
+    Book createWithFireAndSword() {
+        return createHenrykSienkiewiczBook("With Fire and Sword", 1884);
+    }
+
+    Book createTheDeluge() {
+        return createHenrykSienkiewiczBook("The Deluge", 1886);
     }
 
     Book create1984() {
@@ -114,17 +143,42 @@ public:
             .build();
     }
 
+    Book createAshes() {
+        return withId(BookId{*UuidGenerator<BookId>::createUuid()})
+            .withAuthor("Stefan Żeromski")
+            .withTitle("Ashes")
+            .withPublicationYear(1904)
+            .build();
+    }
+
     std::vector<Book> createBooks() {
         return {
             createDziady(),
             createHyperion(),
-            createWiedzminOstatnieZyczenie(),
             create1984(),
             createHobbit(),
             createLordOfTheRings(),
             createSolaris(),
-            createCyberiada()
+            createCyberiada(),
+            createAshes()
         };
+    }
+
+private:
+    Book createHenrykSienkiewiczBook(const std::string& title, int year) {
+        return withId(BookId{*UuidGenerator<BookId>::createUuid()})
+            .withAuthor("Henryk Sienkiewicz")
+            .withTitle(std::move(title))
+            .withPublicationYear(year)
+            .build();
+    }
+
+    Book createAndrzejSapkowskiBook(const std::string& title, int year) {
+        return withId(BookId{*UuidGenerator<BookId>::createUuid()})
+            .withAuthor("Andrzej Sapkowski")
+            .withTitle(std::move(title))
+            .withPublicationYear(year)
+            .build();
     }
 };
 

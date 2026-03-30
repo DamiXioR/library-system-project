@@ -77,14 +77,14 @@ TEST_F(LibraryServiceTests, FindBookByIdInRepository) {
 }
 
 TEST_F(LibraryServiceTests, FindBookByTitleInRepository) {
-  const Book wiedzminBook = bookBuilder->createWiedzminOstatnieZyczenie();
+  const Book wiedzminBook = bookBuilder->createWitcherTheLastWish();
   std::vector<Book> moreWiedzminBooks {
     wiedzminBook,
-    bookBuilder->createWiedzminOstatnieZyczenie(),
-    bookBuilder->createWiedzminOstatnieZyczenie(),
-    bookBuilder->createWiedzminOstatnieZyczenie(),
-    bookBuilder->createWiedzminMieczPrzeznaczenia(),
-    bookBuilder->createWiedzminMieczPrzeznaczenia()
+    bookBuilder->createWitcherTheLastWish(),
+    bookBuilder->createWitcherTheLastWish(),
+    bookBuilder->createWitcherTheLastWish(),
+    bookBuilder->createWitcherSwordOfDestiny(),
+    bookBuilder->createWitcherSwordOfDestiny()
   };
 
   addBooksToRepository(moreWiedzminBooks);
@@ -104,12 +104,12 @@ TEST_F(LibraryServiceTests, FindBookByTitleInRepository) {
 }
 
 TEST_F(LibraryServiceTests, FindBookByAuthorInRepository) {
-  const Book wiedzminBook = bookBuilder->createWiedzminOstatnieZyczenie();
+  const Book wiedzminBook = bookBuilder->createWitcherTheLastWish();
   std::vector<Book> moreWiedzminBooks {
     wiedzminBook,
-    bookBuilder->createWiedzminOstatnieZyczenie(),
-    bookBuilder->createWiedzminMieczPrzeznaczenia(),
-    bookBuilder->createWiedzminMieczPrzeznaczenia(),
+    bookBuilder->createWitcherTheLastWish(),
+    bookBuilder->createWitcherSwordOfDestiny(),
+    bookBuilder->createWitcherSwordOfDestiny(),
   };
 
   addBooksToRepository(moreWiedzminBooks);

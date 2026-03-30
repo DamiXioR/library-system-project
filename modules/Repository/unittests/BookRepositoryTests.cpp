@@ -41,7 +41,7 @@ TEST_F(BookRepositoryTests, AddBook) {
   Book bookHyperion {bookBuilder->createHobbit()};
   ASSERT_TRUE(bookRepo->addBook(bookHyperion));
 
-  Book bookWiedzmin {bookBuilder->createWiedzminOstatnieZyczenie()};
+  Book bookWiedzmin {bookBuilder->createWitcherTheLastWish()};
   ASSERT_TRUE(bookRepo->addBook(bookWiedzmin));
 
   expectedNumOfBooks = 3;
@@ -61,7 +61,7 @@ TEST_F(BookRepositoryTests, GetBookById) {
   Book bookHyperion {bookBuilder->createHobbit()};
   ASSERT_TRUE(bookRepo->addBook(bookHyperion));
 
-  Book bookWiedzmin {bookBuilder->createWiedzminOstatnieZyczenie()};
+  Book bookWiedzmin {bookBuilder->createWitcherTheLastWish()};
   ASSERT_TRUE(bookRepo->addBook(bookWiedzmin));
 
   uint16_t expectedNumOfBooks {3};
@@ -89,7 +89,7 @@ TEST_F(BookRepositoryTests, GetBookByTitle) {
   Book bookHyperion {bookBuilder->createHobbit()};
   ASSERT_TRUE(bookRepo->addBook(bookHyperion));
 
-  Book bookWiedzmin {bookBuilder->createWiedzminOstatnieZyczenie()};
+  Book bookWiedzmin {bookBuilder->createWitcherTheLastWish()};
   ASSERT_TRUE(bookRepo->addBook(bookWiedzmin));
 
   uint16_t expectedNumOfBooksInRepository {3};
@@ -102,12 +102,12 @@ TEST_F(BookRepositoryTests, GetBookByTitle) {
   const Book& book = foundBookHyperion.front().get();
   EXPECT_EQ(book.getTitle(), hyperionBookTitle);
 
-  bookRepo->addBook(bookBuilder->createWiedzminOstatnieZyczenie());
-  bookRepo->addBook(bookBuilder->createWiedzminOstatnieZyczenie());
-  bookRepo->addBook(bookBuilder->createWiedzminOstatnieZyczenie());
+  bookRepo->addBook(bookBuilder->createWitcherTheLastWish());
+  bookRepo->addBook(bookBuilder->createWitcherTheLastWish());
+  bookRepo->addBook(bookBuilder->createWitcherTheLastWish());
 
-  bookRepo->addBook(bookBuilder->createWiedzminMieczPrzeznaczenia());
-  bookRepo->addBook(bookBuilder->createWiedzminMieczPrzeznaczenia());
+  bookRepo->addBook(bookBuilder->createWitcherSwordOfDestiny());
+  bookRepo->addBook(bookBuilder->createWitcherSwordOfDestiny());
 
   expectedNumOfBooksInRepository = 8;
   ASSERT_TRUE(bookRepo->getNumOfBooks() == expectedNumOfBooksInRepository);
@@ -136,15 +136,15 @@ TEST_F(BookRepositoryTests, GetBookByAuthor) {
   Book bookHyperion {bookBuilder->createHobbit()};
   ASSERT_TRUE(bookRepo->addBook(bookHyperion));
 
-  Book bookWiedzmin {bookBuilder->createWiedzminOstatnieZyczenie()};
+  Book bookWiedzmin {bookBuilder->createWitcherTheLastWish()};
   ASSERT_TRUE(bookRepo->addBook(bookWiedzmin));
 
-  bookRepo->addBook(bookBuilder->createWiedzminOstatnieZyczenie());
-  bookRepo->addBook(bookBuilder->createWiedzminOstatnieZyczenie());
-  bookRepo->addBook(bookBuilder->createWiedzminOstatnieZyczenie());
+  bookRepo->addBook(bookBuilder->createWitcherTheLastWish());
+  bookRepo->addBook(bookBuilder->createWitcherTheLastWish());
+  bookRepo->addBook(bookBuilder->createWitcherTheLastWish());
 
-  bookRepo->addBook(bookBuilder->createWiedzminMieczPrzeznaczenia());
-  bookRepo->addBook(bookBuilder->createWiedzminMieczPrzeznaczenia());
+  bookRepo->addBook(bookBuilder->createWitcherSwordOfDestiny());
+  bookRepo->addBook(bookBuilder->createWitcherSwordOfDestiny());
 
   uint16_t expectedNumOfBooksInRepository = 8;
   ASSERT_TRUE(bookRepo->getNumOfBooks() == expectedNumOfBooksInRepository);
@@ -173,7 +173,7 @@ TEST_F(BookRepositoryTests, RemoveBook) {
   Book bookHyperion {bookBuilder->createHobbit()};
   ASSERT_TRUE(bookRepo->addBook(bookHyperion));
 
-  Book bookWiedzmin {bookBuilder->createWiedzminOstatnieZyczenie()};
+  Book bookWiedzmin {bookBuilder->createWitcherTheLastWish()};
   ASSERT_TRUE(bookRepo->addBook(bookWiedzmin));
 
   uint16_t expectedNumOfBooks {3};
