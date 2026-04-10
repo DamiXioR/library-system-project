@@ -8,6 +8,7 @@ project(MyProgram)
 include(CTest)
 
 if(BUILD_TESTING)
+    set(BUILD_SHARED_LIBS ON)
     add_subdirectory(vendor/googletest)
 
     add_library(GTestDependencies INTERFACE)
@@ -18,6 +19,7 @@ if(BUILD_TESTING)
         GTest::gmock
         GTest::gmock_main
     )
+    set(BUILD_SHARED_LIBS OFF)
 endif()
 
 add_subdirectory(app)

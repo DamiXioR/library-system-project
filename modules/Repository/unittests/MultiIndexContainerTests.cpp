@@ -46,7 +46,7 @@ protected:
 TEST_F(MultiIndexContainerTests, AddBookUpdatesPrimaryAndSecondaryIndexes) {
     auto book = bookBuilder.createWitcherSwordOfDestiny();
 
-    ASSERT_TRUE(mic.addBook(book.getBookId(), book));
+    ASSERT_TRUE(mic.addBook(book));
 
     uint16_t expectedNumOfMainKeysInPrimContainer {1};
     uint16_t expectedNumOfMainKeysInSecContainer {1};
@@ -71,7 +71,7 @@ TEST_F(MultiIndexContainerTests, AddBookUpdatesPrimaryAndSecondaryIndexes) {
 
     // The same book added. Key exists so only a new item is added for existed key.
     auto book2 = bookBuilder.createWitcherSwordOfDestiny();
-    ASSERT_TRUE(mic.addBook(book2.getBookId(), book2));
+    ASSERT_TRUE(mic.addBook(book2));
 
     expectedNumOfMainKeysInPrimContainer = 2;
     expectedNumOfSubItemsInSecContainer = 2;
@@ -81,7 +81,7 @@ TEST_F(MultiIndexContainerTests, AddBookUpdatesPrimaryAndSecondaryIndexes) {
 
     // The other book added. Only main keys are updated in primary and secondary containers.
     auto book3 = bookBuilder.createLordOfTheRings();
-    ASSERT_TRUE(mic.addBook(book3.getBookId(), book3));
+    ASSERT_TRUE(mic.addBook(book3));
 
     expectedNumOfMainKeysInPrimContainer = 3;
     expectedNumOfMainKeysInSecContainer = 2;
@@ -94,8 +94,8 @@ TEST_F(MultiIndexContainerTests, AddBookUpdatesPrimaryAndSecondaryIndexes) {
 TEST_F(MultiIndexContainerTests, AddBookWithTheSameBookIdTwiceCausesFailure) {
     auto book = bookBuilder.createWitcherSwordOfDestiny();
 
-    ASSERT_TRUE(mic.addBook(book.getBookId(), book));
-    ASSERT_FALSE(mic.addBook(book.getBookId(), book));
+    ASSERT_TRUE(mic.addBook(book));
+    ASSERT_FALSE(mic.addBook(book));
 
     uint16_t expectedNumOfItems {1};
     ASSERT_EQ(mic.getPrimaryContainer().size(), expectedNumOfItems);
@@ -108,7 +108,7 @@ TEST_F(MultiIndexContainerTests, AddBookWithWeirdTitleUpdatesTitleWordsContainer
     std::string specyficBookTitle {"    Who     wants      more      spaces or or or more or a a e one?       "};
     auto book = Book(bookId, author, specyficBookTitle);
 
-    ASSERT_TRUE(mic.addBook(book.getBookId(), book));
+    ASSERT_TRUE(mic.addBook(book));
 
     std::vector<std::string> wordsInBookTitle {
         "wants",
@@ -131,7 +131,7 @@ TEST_F(MultiIndexContainerTests, AddBookWithWeirdTitleUpdatesTitleWordsContainer
     // Bunch of spaces and one letter at the end
     auto book2 = Book(bookId2, author, specyficBookTitle);
 
-    ASSERT_TRUE(mic.addBook(book2.getBookId(), book2));
+    ASSERT_TRUE(mic.addBook(book2));
 
     std::vector<std::string> wordsInBook2Title {
         "bob",
@@ -151,8 +151,8 @@ TEST_F(MultiIndexContainerTests, RemoveBookUpdatesPrimaryAndSecondaryIndexes) {
     auto book = bookBuilder.createWitcherSwordOfDestiny();
     auto book2 = bookBuilder.createWitcherSwordOfDestiny();
 
-    ASSERT_TRUE(mic.addBook(book.getBookId(), book));
-    ASSERT_TRUE(mic.addBook(book2.getBookId(), book2));
+    ASSERT_TRUE(mic.addBook(book));
+    ASSERT_TRUE(mic.addBook(book2));
 
     uint16_t expectedNumOfMainKeysInPrimContainer {2};
 
@@ -194,7 +194,7 @@ class FilterMultiIndexContainerTests : public MultiIndexContainerTests {
 protected:
     void addBooksToMultiIndexContainer(const std::vector<Book>& books){
         for(const auto& book : books){
-            ASSERT_TRUE(mic.addBook(book.getBookId(), book));
+            ASSERT_TRUE(mic.addBook(book));
         }
     }
 
@@ -223,12 +223,12 @@ TEST_F(FilterMultiIndexContainerTests, FilterStartReplacesPreviousMicWithNewOne)
         "Not existed title"
     };
 
-    const auto foundBooks = filter.filterStart(&mic).fitlerTextIndexedContainer(mic.getTitleIndex(), titles).applyFilters();
+    const auto foundBooks = filter.filterStart(&mic).withTitleFilter(titles).applyFilters();
     uint16_t expecedNumOfFoundBooks {2};
     ASSERT_EQ(foundBooks.size(), expecedNumOfFoundBooks);
 
     MultiIndexedContainer newMic;
-    const auto foundBooksInNewMic = filter.filterStart(&newMic).fitlerTextIndexedContainer(newMic.getTitleIndex(), titles).applyFilters();
+    const auto foundBooksInNewMic = filter.filterStart(&newMic).withTitleFilter(titles).applyFilters();
     expecedNumOfFoundBooks = 0;
     ASSERT_EQ(foundBooksInNewMic.size(), expecedNumOfFoundBooks);
 }

@@ -9,20 +9,22 @@
 
 #include "Book.hpp"
 #include "BookId.hpp"
+#include "IDataContainerFilter.hpp"
 #include "MultiIndexedContainer.hpp"
 
 namespace DataBase {
 
-using FilteredBooks = std::unordered_set<std::weak_ptr<Book>, WeakBookHash, WeakBookEqual>;
-
 constexpr uint16_t BASE_FILTERED_BOOKID_SIZE {20};
 
-class FilterMultiIndexedContainer {
+class FilterMultiIndexedContainer : public IDataContainerFilter {
 public:
     FilterMultiIndexedContainer() {
-        filteredBooks.reserve(BASE_FILTERED_BOOKID_SIZE);
         appliedFilters.resetFilters();
+        mic = nullptr;
+    }
 
+    auto queryService(FilterQuery filterQuery) -> DataBase::FilteredBooks {
+        return {};
     }
 
     auto filterStart(MultiIndexedContainer* micToFilter) -> FilterMultiIndexedContainer& {
@@ -31,7 +33,6 @@ public:
         }
 
         appliedFilters.resetFilters();
-        filteredBooks.clear();
 
         return *this;
     }
@@ -52,7 +53,9 @@ public:
     }
 
     template <class SecContainerType>
-    auto fitlerTextIndexedContainer(SecContainerType secContainer, std::vector<std::string> data) -> FilterMultiIndexedContainer& {
+    auto fitlerTextIndexedContainer(SecContainerType secContainer, std::vector<std::string> data) -> FilteredBooks {
+        FilteredBooks filteredBooks;
+        filteredBooks.reserve(BASE_FILTERED_BOOKID_SIZE);
         for(const auto& item : data){
             const auto foundIt {secContainer.find(item)};
             if(foundIt != secContainer.end()){
@@ -63,11 +66,13 @@ public:
                 }
             }
         }
-        return *this;
+        return filteredBooks;
     }
 
     template <class SecContainerType, class NumType>
-    auto filterNumIndexedContainer(SecContainerType secContainer, NumType min, NumType max) -> FilterMultiIndexedContainer&{
+    auto filterNumIndexedContainer(SecContainerType secContainer, NumType min, NumType max) -> FilteredBooks {
+        FilteredBooks filteredBooks;
+        filteredBooks.reserve(BASE_FILTERED_BOOKID_SIZE);
         auto itLow = secContainer.lower_bound(min);
         auto itHigh = secContainer.upper_bound(max);
         for (auto it = itLow; it != itHigh; ++it) {
@@ -78,22 +83,29 @@ public:
                     }
             }
         }
-        return *this;
+        return filteredBooks;
     }
 
     auto applyFilters() -> FilteredBooks {
-        if(auto& [isTitleFilterApplied, titles] = appliedFilters.titleFilter; isTitleFilterApplied && filteredBooks.empty()){
-            fitlerTextIndexedContainer(mic->getTitleIndex(), titles);
+        FilteredBooks filteredBooks;
+        filteredBooks.reserve(BASE_FILTERED_BOOKID_SIZE);
+        auto isPrimaryContainerUsed {false};
+
+        if(auto& [isTitleFilterApplied, titles] = appliedFilters.titleFilter; isTitleFilterApplied){
+            filteredBooks = fitlerTextIndexedContainer(mic->getTitleIndex(), titles);
             isTitleFilterApplied = false;
+            isPrimaryContainerUsed = true;
         }
-        if(auto& [isAuthorFilterApplied, authors] = appliedFilters.authorFilter; isAuthorFilterApplied && filteredBooks.empty()){
-            fitlerTextIndexedContainer(mic->getAuthorIndex(), authors);
+        if(auto& [isAuthorFilterApplied, authors] = appliedFilters.authorFilter; isAuthorFilterApplied && !isPrimaryContainerUsed){
+            filteredBooks = fitlerTextIndexedContainer(mic->getAuthorIndex(), authors);
             isAuthorFilterApplied = false;
+            isPrimaryContainerUsed = true;
             
         }
-        if(auto& [isPubYearFilterApplied, yearRange] = appliedFilters.pYearFilter; isPubYearFilterApplied && filteredBooks.empty()){
-            filterNumIndexedContainer(mic->getYearIndex(), yearRange.first, yearRange.second);
+        if(auto& [isPubYearFilterApplied, yearRange] = appliedFilters.pYearFilter; isPubYearFilterApplied && !isPrimaryContainerUsed){
+            filteredBooks = filterNumIndexedContainer(mic->getYearIndex(), yearRange.first, yearRange.second);
             isPubYearFilterApplied = false;
+            isPrimaryContainerUsed = true;
         }
 
         auto makeEqualityFilter = [](auto filter, auto getter) -> auto {
@@ -149,8 +161,7 @@ private:
 
     } appliedFilters;
 
-    FilteredBooks filteredBooks;
-    MultiIndexedContainer* mic;
+    MultiIndexedContainer* mic {nullptr};
 };
 
 } // namespace DataBase

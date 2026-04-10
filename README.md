@@ -35,11 +35,6 @@ Build googletest framework locally. The project uses GTest and GMock shared libr
 
 ```bash
 git clone https://github.com/google/googletest.git -b v1.17.0
-cd googletest
-mkdir build
-cd build
-cmake .. -DBUILD_SHARED_LIBS=ON
-cmake --build . --config Release
 ```
 
 Alternatively, for a local installation:
@@ -91,17 +86,17 @@ Building a specific module or running unit tests for that module can be done usi
 
 To build the module shared library use:
 ```bash
-cmake --build build --target DataModule
+cmake --build build --target Repository
 ```
 
 To build the unit tests for the specific module use:
 ```bash
-cmake --build build --target DataModuleTests
+cmake --build build --target RepositoryTests
 ```
 
 To run the tests for the specific module use:
 ```bash
-ctest --test-dir build -R DataModuleTests --verbose
+ctest --test-dir build -R RepositoryTests --verbose
 ```
 
 If a unit test name is unique among all unit tests, you can use just the first letter of the test name, or the first few letters until they distinguish the test from the others. For example, for __DataModuleTest__ and __DataSuperModuleTest__, you can use __DataM__ and __DataS__.

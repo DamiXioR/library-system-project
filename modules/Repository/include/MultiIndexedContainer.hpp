@@ -14,12 +14,13 @@
 #include <optional>
 #include <cwctype>
 
+#include "IDataContainer.hpp"
 #include "Book.hpp"
 #include "BookId.hpp"
 
-namespace DataBase {
 
 namespace {
+    // TODO: move to a separate file
     std::unordered_set<std::string> stopwords_en = {
         // articles
         "the",
@@ -89,21 +90,7 @@ namespace {
     };
 } // anonymous namespace
 
-struct WeakBookHash {
-    auto operator()(const std::weak_ptr<Book>& wp) const noexcept -> size_t {
-        auto sp = wp.lock();
-        return sp ? std::hash<Book*>()(sp.get()) : 0;
-    }
-};
-
-struct WeakBookEqual {
-    auto operator()(const std::weak_ptr<Book>& first, const std::weak_ptr<Book>& second) const -> bool {
-        auto sFirst = first.lock();
-        auto sSecond = second.lock();
-        if (!sFirst || !sSecond) return false;
-        return sFirst->getBookId().getBookId() == sSecond->getBookId().getBookId();
-    }
-};
+namespace DataBase {
 
 using PrimaryContainer = 
     std::unordered_map<BookId, std::shared_ptr<Book>, BookId::BookIdHash>;
@@ -116,7 +103,7 @@ using SecondaryUint16tIndexOrdered =
     std::map<std::optional<uint16_t>,
         std::unordered_set<std::weak_ptr<Book>, WeakBookHash, WeakBookEqual>>;
 
-class MultiIndexedContainer {
+class MultiIndexedContainer : public IDataContainer {
 public:
     MultiIndexedContainer() = default;
 
@@ -138,19 +125,20 @@ public:
     const SecondaryTextIndex& getAuthorIndex() const { return *m_authorIndex; }
     const SecondaryUint16tIndexOrdered& getYearIndex() const { return *m_yearIndex; }
 
-    auto addBook(const BookId& bookId, const Book& book) -> bool {
+    auto addBook(Book book) -> bool {
         auto bookPtr = std::make_shared<Book>(book);
+        auto bookId = bookPtr->getBookId();
 
         auto [it, inserted] = m_primaryContainer->emplace(bookId, bookPtr);
         if (!inserted) return false; // element actually exists
 
-        auto [itTitle, _] = m_titleIndex->try_emplace(book.getTitle());
+        auto [itTitle, _] = m_titleIndex->try_emplace(bookPtr->getTitle());
         itTitle->second.insert(bookPtr);
 
-        auto [itBook, _] = m_authorIndex->try_emplace(book.getAuthor());
+        auto [itBook, _] = m_authorIndex->try_emplace(bookPtr->getAuthor());
         itBook->second.insert(bookPtr);
 
-        auto [itYear, _] = m_yearIndex->try_emplace(book.getPublicationYear());
+        auto [itYear, _] = m_yearIndex->try_emplace(bookPtr->getPublicationYear());
         itYear->second.insert(bookPtr);
 
         fillSplitTitleWordsContainer(bookPtr);
@@ -159,20 +147,20 @@ public:
     }
 
     auto removeBook(const BookId& bookId) -> bool {
-        auto result = true;
-
         auto primContainerIt = m_primaryContainer->find(bookId);
         if (primContainerIt == m_primaryContainer->end()) {
-            return !result;
+            return false;
         }
 
         std::shared_ptr<Book> bookToRemove = primContainerIt->second;
 
+        auto result {true};
         result = removeFromSecondaryContainerMap(m_titleIndex.get(), bookToRemove->getTitle(), bookToRemove);
         if(!result) return result;
         result = removeFromSecondaryContainerMap(m_authorIndex.get(), bookToRemove->getAuthor(), bookToRemove);
         if(!result) return result;
         result = removeFromSecondaryContainerMap(m_yearIndex.get(), bookToRemove->getPublicationYear(), bookToRemove);
+        if(!result) return result;
 
         const auto splitedTitle {splitTitleIntoTokens(bookToRemove)};
         for(const auto& word : splitedTitle){
@@ -180,12 +168,16 @@ public:
             if(!result) return result;
         }
 
-        if(auto it = m_primaryContainer->erase(primContainerIt); it != m_primaryContainer->end()){
-            result = false;
-            return result;
+        uint16_t noBookRemoved {0};
+        if(auto eraseCount = m_primaryContainer->erase(primContainerIt->first); eraseCount == noBookRemoved){
+            return false;
         };
 
         return result;
+    }
+
+    auto getContainerSize() const noexcept -> size_t {
+        return m_primaryContainer->size();
     }
 
 private:

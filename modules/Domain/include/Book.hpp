@@ -4,6 +4,7 @@
 #include <string>
 #include <cstdint>
 #include <optional>
+#include <memory>
 
 #include "Book.hpp"
 #include "BookId.hpp"
@@ -53,6 +54,22 @@ private:
     std::string m_title;
     std::string m_author;
     std::optional<uint16_t> m_publicationYear {};
+};
+
+struct WeakBookHash {
+    auto operator()(const std::weak_ptr<Book>& wp) const noexcept -> size_t {
+        auto sp = wp.lock();
+        return sp ? std::hash<Book*>()(sp.get()) : 0;
+    }
+};
+
+struct WeakBookEqual {
+    auto operator()(const std::weak_ptr<Book>& first, const std::weak_ptr<Book>& second) const -> bool {
+        auto sFirst = first.lock();
+        auto sSecond = second.lock();
+        if (!sFirst || !sSecond) return false;
+        return sFirst->getBookId().getBookId() == sSecond->getBookId().getBookId();
+    }
 };
 
 #endif // BOOK_HPP

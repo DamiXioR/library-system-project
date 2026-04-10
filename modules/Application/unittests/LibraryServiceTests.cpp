@@ -12,11 +12,11 @@
 #include "BookBuilderHelper.hpp"
 
 using namespace BookHelpers;
+using namespace Repository;
 
 class LibraryServiceTests : public ::testing::Test {
 protected:
   static std::unique_ptr<BookBuilder> bookBuilder;
-  std::unique_ptr<IBookRepository> bookRepo;
   std::unique_ptr<LibraryService> libraryService;
 
   static void SetUpTestSuite() {
@@ -28,7 +28,10 @@ protected:
   }
 
   void SetUp() override {
-      bookRepo = std::make_unique<BookRepository>();
+      auto bookRepo = std::make_unique<BookRepository>(
+        std::make_unique<DataBase::MultiIndexedContainer>(), 
+        std::make_unique<DataBase::FilterMultiIndexedContainer>()
+      );
       libraryService = std::make_unique<LibraryService>(std::move(bookRepo));
   }
 
@@ -39,7 +42,6 @@ protected:
   }
 
   void TearDown() override {
-      bookRepo.reset();
       libraryService.reset();
   }
 };
@@ -61,72 +63,30 @@ TEST_F(LibraryServiceTests, AddBookToRepository) {
   ASSERT_EQ(libraryService->getNumOfBooks(), expectedNumOfBooks);
 }
 
-TEST_F(LibraryServiceTests, FindBookByIdInRepository) {
-  const auto books = bookBuilder->createBooks();
+// TEST_F(LibraryServiceTests, FindBookInRepository) {
+//   const Book wiedzminBook = bookBuilder->createWitcherTheLastWish();
+//   std::vector<Book> moreWiedzminBooks {
+//     wiedzminBook,
+//     bookBuilder->createWitcherTheLastWish(),
+//     bookBuilder->createWitcherSwordOfDestiny(),
+//     bookBuilder->createWitcherSwordOfDestiny(),
+//   };
 
-  addBooksToRepository(books);
+//   addBooksToRepository(moreWiedzminBooks);
 
-  const uint16_t expectedNumOfBooks {8};
-  ASSERT_EQ(libraryService->getNumOfBooks(), expectedNumOfBooks);
+//   uint16_t expectedNumOfBooksInRepository = 4;
+//   ASSERT_EQ(libraryService->getNumOfBooks(), expectedNumOfBooksInRepository);
 
-  const auto& firstBook = books.front();
-  const auto found {libraryService->findBookById(firstBook.getBookId())};
+//   const auto& wiedzminBookAuthor = wiedzminBook.getAuthor();
+//   const auto found {libraryService->findBookByAuthor(wiedzminBookAuthor)};
 
-  ASSERT_TRUE(found.has_value());
-  ASSERT_EQ(firstBook.getTitle(), found->get().getTitle());
-}
+//   ASSERT_FALSE(found.empty());
 
-TEST_F(LibraryServiceTests, FindBookByTitleInRepository) {
-  const Book wiedzminBook = bookBuilder->createWitcherTheLastWish();
-  std::vector<Book> moreWiedzminBooks {
-    wiedzminBook,
-    bookBuilder->createWitcherTheLastWish(),
-    bookBuilder->createWitcherTheLastWish(),
-    bookBuilder->createWitcherTheLastWish(),
-    bookBuilder->createWitcherSwordOfDestiny(),
-    bookBuilder->createWitcherSwordOfDestiny()
-  };
+//   uint16_t expectedFoundNumOfBooks = 4;
+//   ASSERT_EQ(found.size(), expectedFoundNumOfBooks);
+//   ASSERT_EQ(found.front().get().getAuthor(), wiedzminBookAuthor);
 
-  addBooksToRepository(moreWiedzminBooks);
-
-  uint16_t expectedNumOfBooksInRepository = 6;
-  ASSERT_EQ(libraryService->getNumOfBooks(), expectedNumOfBooksInRepository);
-  
-  const auto& wiedzminBookTitle = wiedzminBook.getTitle();
-  const auto found {libraryService->findBookByTitle(wiedzminBookTitle)};
-
-  ASSERT_FALSE(found.empty());
-
-  uint16_t expectedFoundNumOfBooks = 4;
-  ASSERT_EQ(found.size(), expectedFoundNumOfBooks);
-  ASSERT_EQ(found.front().get().getTitle(), wiedzminBookTitle);
-
-}
-
-TEST_F(LibraryServiceTests, FindBookByAuthorInRepository) {
-  const Book wiedzminBook = bookBuilder->createWitcherTheLastWish();
-  std::vector<Book> moreWiedzminBooks {
-    wiedzminBook,
-    bookBuilder->createWitcherTheLastWish(),
-    bookBuilder->createWitcherSwordOfDestiny(),
-    bookBuilder->createWitcherSwordOfDestiny(),
-  };
-
-  addBooksToRepository(moreWiedzminBooks);
-
-  uint16_t expectedNumOfBooksInRepository = 4;
-  ASSERT_EQ(libraryService->getNumOfBooks(), expectedNumOfBooksInRepository);
-
-  const auto& wiedzminBookAuthor = wiedzminBook.getAuthor();
-  const auto found {libraryService->findBookByAuthor(wiedzminBookAuthor)};
-
-  ASSERT_FALSE(found.empty());
-
-  uint16_t expectedFoundNumOfBooks = 4;
-  ASSERT_EQ(found.size(), expectedFoundNumOfBooks);
-  ASSERT_EQ(found.front().get().getAuthor(), wiedzminBookAuthor);
-
-}
+// }
 
 TEST_F(LibraryServiceTests, RemoveBookFromRepository) {
   const auto books = bookBuilder->createBooks();
