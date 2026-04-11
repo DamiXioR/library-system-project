@@ -26,8 +26,8 @@ protected:
 
   void SetUp() override {
       auto mic = std::make_unique<DataBase::MultiIndexedContainer>();
-      auto micFilter = std::make_unique<DataBase::FilterMultiIndexedContainer>();
       micRawHandler = mic.get();
+      auto micFilter = std::make_unique<DataBase::FilterMultiIndexedContainer>(micRawHandler);
       micFilterRawHandler = micFilter.get();
       bookRepo = std::make_unique<BookRepository>(std::move(mic), std::move(micFilter));
   }
@@ -56,29 +56,76 @@ TEST_F(BookRepositoryTests, AddBook) {
   ASSERT_TRUE(bookRepo->getNumOfBooks() == expectedNumOfBooks);
 }
 
-TEST_F(BookRepositoryTests, GetBookByTitle) {
+TEST_F(BookRepositoryTests, GetRequestedBooks) {
   auto bookDziady = std::make_shared<Book>(bookBuilder->createDziady());
   ASSERT_TRUE(bookRepo->addBook(*bookDziady));
 
   auto bookHyperion = std::make_shared<Book>(bookBuilder->createHyperion());
   ASSERT_TRUE(bookRepo->addBook(*bookHyperion));
 
-  auto bookWiedzmin = std::make_shared<Book>(bookBuilder->createWitcherTheLastWish());
-  ASSERT_TRUE(bookRepo->addBook(*bookWiedzmin));
+  auto bookSolaris = std::make_shared<Book>(bookBuilder->createSolaris());
+  ASSERT_TRUE(bookRepo->addBook(*bookSolaris));
 
   uint16_t expectedNumOfBooksInRepository {3};
   ASSERT_TRUE(bookRepo->getNumOfBooks() == expectedNumOfBooksInRepository);
 
   DataBase::FilterQuery query {
-    {"book_title", {"Hyperion"}}
+    {DataBase::BOOK_FILTER_TYPE::Title, {"Hyperion"}}
   };
 
   auto filteredBooks {bookRepo->filterBooks(query)};
-  auto it {filteredBooks.find(bookHyperion)};
-  ASSERT_TRUE(it == filteredBooks.end());
 
+  uint16_t expectedNumOfFilteredBooks {1};
+  ASSERT_EQ(filteredBooks.size(), expectedNumOfFilteredBooks);
+  ASSERT_TRUE(filteredBooks.contains(bookHyperion));
+
+  std::vector<std::shared_ptr<Book>> books {
+      std::make_shared<Book>(bookBuilder->createWitcherSwordOfDestiny()),
+      std::make_shared<Book>(bookBuilder->createWitcherTheLastWish()),
+      std::make_shared<Book>(bookBuilder->createWitcherLadyOfTheLake()),
+      std::make_shared<Book>(bookBuilder->createWitcherBloodOfElves()),
+      std::make_shared<Book>(bookBuilder->createWitcherBaptismOfFire()),
+      std::make_shared<Book>(bookBuilder->createWitcherTimeOfContempt()),
+      std::make_shared<Book>(bookBuilder->createWitcherTowerOfSwallows())
+  };
+
+  for (const auto& bookPtr : books) {
+    ASSERT_TRUE(bookRepo->addBook(*bookPtr));
+  }
+
+  expectedNumOfBooksInRepository = 10;
+  ASSERT_TRUE(bookRepo->getNumOfBooks() == expectedNumOfBooksInRepository);
+
+  DataBase::FilterQuery queryAuthor {
+    {DataBase::BOOK_FILTER_TYPE::Author, {"Andrzej Sapkowski"}}
+  };
+
+  auto filteredBooks2 {bookRepo->filterBooks(queryAuthor)};
+
+  expectedNumOfFilteredBooks = 7;
+  ASSERT_EQ(filteredBooks2.size(), expectedNumOfFilteredBooks);
+  for (const auto& bookPtr : books) {
+    ASSERT_TRUE(filteredBooks2.contains(bookPtr));
+  }
+
+  uint16_t minYear {1993};
+  uint16_t maxYear {1996};
+  auto publYearData {std::to_string(minYear) + std::to_string(maxYear)};
+  DataBase::FilterQuery queryPublYear {
+    {DataBase::BOOK_FILTER_TYPE::PublYear, {publYearData}}
+  };
+
+  auto filteredBooks3 {bookRepo->filterBooks(queryPublYear)};
+
+  expectedNumOfFilteredBooks = 4;
+  ASSERT_EQ(filteredBooks3.size(), expectedNumOfFilteredBooks);
+  for (const auto& weakBook : filteredBooks3) {
+    auto spBook {weakBook.lock()};
+    ASSERT_TRUE(spBook);
+    auto publYear {spBook->getPublicationYear()};
+    ASSERT_TRUE(publYear >= minYear && publYear <= maxYear);
+  }
 }
-
 
 TEST_F(BookRepositoryTests, RemoveBookFailed) {
   Book defaultBook {bookBuilder->build()};

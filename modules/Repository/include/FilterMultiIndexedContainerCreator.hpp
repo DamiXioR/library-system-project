@@ -17,35 +17,10 @@ namespace DataBase {
 
 constexpr uint16_t BASE_FILTERED_BOOKID_SIZE {20};
 
-class FilterMultiIndexedContainer : public IDataContainerFilter {
+class FilterMultiIndexedContainer {
 public:
     FilterMultiIndexedContainer(MultiIndexedContainer* mic) : m_micForFilter(mic) {
         appliedFilters.resetFilters();
-    }
-
-    auto queryService(FilterQuery filterQuery) -> DataBase::FilteredBooks {
-        prepareNewFiltering();
-        if(filterQuery.contains(BOOK_FILTER_TYPE::Title)){
-            auto titles {filterQuery[BOOK_FILTER_TYPE::Title]};
-            withTitleFilter(titles);
-        }
-        if(filterQuery.contains(BOOK_FILTER_TYPE::Author)){
-            auto authors {filterQuery[BOOK_FILTER_TYPE::Author]};
-            withAuthorFilter(authors);
-        }
-        if(filterQuery.contains(BOOK_FILTER_TYPE::PublYear)){
-            auto publicationYear {filterQuery[BOOK_FILTER_TYPE::PublYear]};
-            auto itBegin {publicationYear.front().begin()};
-            // TODO: stoi verification + string verification
-            uint16_t min = static_cast<uint16_t>(
-                std::stoi(std::string{itBegin, std::next(itBegin, 4)})
-            );
-            uint16_t max = static_cast<uint16_t>(
-                std::stoi(std::string{std::next(itBegin, 4), publicationYear.front().end()})
-            );
-            withPublicationYearFilter(min, max);
-        }
-        return applyFilters();
     }
 
     auto swapMic(MultiIndexedContainer* micToFilter) -> FilterMultiIndexedContainer& {

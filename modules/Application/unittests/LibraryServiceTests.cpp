@@ -28,9 +28,11 @@ protected:
   }
 
   void SetUp() override {
+      auto mic {std::make_unique<DataBase::MultiIndexedContainer>()};
+      auto rawMic {mic.get()};
       auto bookRepo = std::make_unique<BookRepository>(
-        std::make_unique<DataBase::MultiIndexedContainer>(), 
-        std::make_unique<DataBase::FilterMultiIndexedContainer>()
+        std::move(mic),
+        std::make_unique<DataBase::FilterMultiIndexedContainer>(rawMic)
       );
       libraryService = std::make_unique<LibraryService>(std::move(bookRepo));
   }

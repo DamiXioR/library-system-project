@@ -11,8 +11,15 @@
 
 namespace DataBase {
 
+enum class BOOK_FILTER_TYPE {
+    NotApplied = 0,
+    Title,
+    Author,
+    PublYear
+};
+
 using FilteredBooks = std::unordered_set<std::weak_ptr<Book>, WeakBookHash, WeakBookEqual>;
-using FilterQuery = std::unordered_map<std::string, std::vector<std::string>>;
+using FilterQuery = std::unordered_map<BOOK_FILTER_TYPE, std::vector<std::string>>;
 
 class IDataContainerFilter {
 public:

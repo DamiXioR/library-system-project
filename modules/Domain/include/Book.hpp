@@ -57,12 +57,13 @@ private:
 };
 
 struct WeakBookHash {
-    auto operator()(const std::weak_ptr<Book>& wp) const noexcept -> size_t {
-        auto sp = wp.lock();
-        return sp ? std::hash<Book*>()(sp.get()) : 0;
+    size_t operator()(const std::weak_ptr<Book>& wp) const noexcept {
+        if (auto sp = wp.lock()) {
+            return std::hash<std::string>()(sp->getBookId().getBookId());
+        }
+        return 0;
     }
 };
-
 struct WeakBookEqual {
     auto operator()(const std::weak_ptr<Book>& first, const std::weak_ptr<Book>& second) const -> bool {
         auto sFirst = first.lock();
