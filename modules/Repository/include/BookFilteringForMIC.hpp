@@ -6,44 +6,30 @@
 #include <string>
 #include <cstdint>
 #include <ranges>
-#include <iostream> // testing
 
 #include "Book.hpp"
 #include "BookId.hpp"
-#include "IDataContainerFilter.hpp"
+#include "IBookFilteringForMIC.hpp"
 #include "MultiIndexedContainer.hpp"
+#include "BookFilters.hpp"
 
 namespace DataBase {
 
 constexpr uint16_t BASE_FILTERED_BOOKID_SIZE {20};
 
-class FilterMultiIndexedContainer {
+class BookFilteringForMIC : public IBookFilteringForMIC {
 public:
-    FilterMultiIndexedContainer(MultiIndexedContainer* mic) : m_micForFilter(mic) {
-        appliedFilters.resetFilters();
+    BookFilteringForMIC(MultiIndexedContainer* mic) : m_micForFilter(mic) {}
+
+    auto filterService(BookFilters bookFilters) -> DataBase::FilteredBooks {
+        return startFiltering(std::move(bookFilters));
     }
 
-    auto swapMic(MultiIndexedContainer* micToFilter) -> FilterMultiIndexedContainer& {
+    auto swapMic(MultiIndexedContainer* micToFilter) -> BookFilteringForMIC& {
         if(!m_micForFilter || (m_micForFilter && m_micForFilter != micToFilter)){
             m_micForFilter = micToFilter;
         }
         return *this;
-    }
-
-    auto prepareNewFiltering() -> void {
-        appliedFilters.resetFilters();
-    }
-
-    auto withTitleFilter(std::vector<std::string> titles) -> void {
-        appliedFilters.titleFilter = std::make_pair(true, titles);
-    }
-
-    auto withAuthorFilter(std::vector<std::string> authors) -> void {
-        appliedFilters.authorFilter = std::make_pair(true, authors);
-    }
-
-    auto withPublicationYearFilter(uint16_t minYear, uint16_t maxYear) -> void {
-        appliedFilters.pYearFilter = std::make_pair(true, std::make_pair(minYear, maxYear));
     }
 
     template <class SecContainerType>
@@ -80,23 +66,23 @@ public:
         return filteredBooks;
     }
 
-    auto applyFilters() -> FilteredBooks {
+    auto startFiltering(BookFilters bookFilters) -> FilteredBooks {
         FilteredBooks filteredBooks;
         filteredBooks.reserve(BASE_FILTERED_BOOKID_SIZE);
         auto isPrimaryContainerUsed {false};
 
-        if(auto& [isTitleFilterApplied, titles] = appliedFilters.titleFilter; isTitleFilterApplied){
+        if(auto& [isTitleFilterApplied, titles] = bookFilters.titleFilter; isTitleFilterApplied){
             filteredBooks = fitlerTextIndexedContainer(m_micForFilter->getTitleIndex(), titles);
             isTitleFilterApplied = false;
             isPrimaryContainerUsed = true;
         }
-        if(auto& [isAuthorFilterApplied, authors] = appliedFilters.authorFilter; isAuthorFilterApplied && !isPrimaryContainerUsed){
+        if(auto& [isAuthorFilterApplied, authors] = bookFilters.authorFilter; isAuthorFilterApplied && !isPrimaryContainerUsed){
             filteredBooks = fitlerTextIndexedContainer(m_micForFilter->getAuthorIndex(), authors);
             isAuthorFilterApplied = false;
             isPrimaryContainerUsed = true;
             
         }
-        if(auto& [isPubYearFilterApplied, yearRange] = appliedFilters.pYearFilter; isPubYearFilterApplied && !isPrimaryContainerUsed){
+        if(auto& [isPubYearFilterApplied, yearRange] = bookFilters.pYearFilter; isPubYearFilterApplied && !isPrimaryContainerUsed){
             filteredBooks = filterNumIndexedContainer(m_micForFilter->getYearIndex(), yearRange.first, yearRange.second);
             isPubYearFilterApplied = false;
             isPrimaryContainerUsed = true;
@@ -115,8 +101,8 @@ public:
             };
         };
 
-        auto usePublYearFilter = [*this](auto& weekBook) -> bool {
-            if(auto [isPubYearFilterApplied, yearRange] = appliedFilters.pYearFilter; isPubYearFilterApplied){
+        auto usePublYearFilter = [&bookFilters](auto& weekBook) -> bool {
+            if(auto [isPubYearFilterApplied, yearRange] = bookFilters.pYearFilter; isPubYearFilterApplied){
                 auto book {weekBook.lock()};
                 if (!book) return false;
                 if(book->getPublicationYear() >= yearRange.first && book->getPublicationYear() <= yearRange.second){
@@ -129,11 +115,11 @@ public:
 
         return filteredBooks
                 | std::views::filter(makeEqualityFilter(
-                    appliedFilters.titleFilter,
+                    bookFilters.titleFilter,
                     [](const auto& b) -> const auto& { return b->getTitle(); }
                 ))
                 | std::views::filter(makeEqualityFilter(
-                    appliedFilters.authorFilter,
+                    bookFilters.authorFilter,
                     [](const auto& b) -> const auto& { return b->getAuthor(); }
                 ))
                 | std::views::filter(usePublYearFilter)
@@ -141,20 +127,6 @@ public:
     }
 
 private:
-    class AppliedFilters {
-    public:
-        std::pair<bool, std::vector<std::string>> titleFilter;
-        std::pair<bool, std::vector<std::string>> authorFilter;
-        std::pair<bool, std::pair<uint16_t, uint16_t>> pYearFilter;
-
-        auto resetFilters() -> void{
-            titleFilter = {false, {}};
-            authorFilter = {false, {}};
-            pYearFilter = {false, {}};
-        }
-
-    } appliedFilters;
-
     MultiIndexedContainer* m_micForFilter {nullptr};
 };
 

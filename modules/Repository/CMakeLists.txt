@@ -1,9 +1,11 @@
 # --- Repository module (library) ---
 
 add_library(Repository SHARED
+    src/BookFilters.cpp
     src/BookRepository.cpp
     src/MultiIndexedContainer.cpp
-    src/FilterMultiIndexedContainer.cpp
+    src/BookFilteringForMIC.cpp
+    src/BookFiltersCreator.cpp
 )
 
 target_include_directories(Repository PUBLIC

@@ -6,7 +6,8 @@
 #include <memory>
 
 #include "MultiIndexedContainer.hpp"
-#include "FilterMultiIndexedContainer.hpp"
+#include "BookFilteringForMIC.hpp"
+#include "BookFiltersCreator.hpp"
 #include "BookBuilderHelper.hpp"
 
 using namespace BookHelpers;
@@ -34,7 +35,8 @@ protected:
     }
 
     BookBuilder bookBuilder;
-    MultiIndexedContainer mic;    
+    MultiIndexedContainer mic;
+    BookFiltersCreator filterCreator;
 };
 
 /*
@@ -198,10 +200,10 @@ protected:
         }
     }
     void SetUp() override {
-        filter = std::make_unique<FilterMultiIndexedContainer>(&mic);
+        filter = std::make_unique<BookFilteringForMIC>(&mic);
     }
 
-    std::unique_ptr<FilterMultiIndexedContainer> filter;
+    std::unique_ptr<BookFilteringForMIC> filter;
 };
 
 /*
@@ -226,17 +228,16 @@ TEST_F(FilterMultiIndexContainerTests, FilterStartReplacesPreviousMicWithNewOne)
         "Not existed title"
     };
 
-    DataBase::FilterQuery queryTitle {
-        {BOOK_FILTER_TYPE::Title, titles}
-    };
+    BookFilters bf;
+    filterCreator.withTitleFilter(bf, titles);
 
-    const auto foundBooks = filter->queryService(queryTitle);
+    const auto foundBooks = filter->filterService(bf);
     uint16_t expecedNumOfFoundBooks {2};
     ASSERT_EQ(foundBooks.size(), expecedNumOfFoundBooks);
 
     MultiIndexedContainer newMic;
     filter->swapMic(&newMic);
-    const auto foundBooksInNewMic = filter->queryService(queryTitle);
+    const auto foundBooksInNewMic = filter->filterService(bf);
     expecedNumOfFoundBooks = 0;
     ASSERT_EQ(foundBooksInNewMic.size(), expecedNumOfFoundBooks);
 }
@@ -258,12 +259,11 @@ TEST_F(FilterMultiIndexContainerTests, FilterBooksWithRequestedTitleList) {
         "1984",
         "Not existed title"
     };
-    
-    DataBase::FilterQuery queryTitle {
-        {BOOK_FILTER_TYPE::Title, titles}
-    };
 
-    const auto foundBooks = filter->queryService(queryTitle);
+    BookFilters bf;
+    filterCreator.withTitleFilter(bf, titles);
+
+    const auto foundBooks = filter->filterService(bf);
 
     uint16_t expecedNumOfFoundBooks {4};
     ASSERT_EQ(foundBooks.size(), expecedNumOfFoundBooks);
@@ -292,11 +292,10 @@ TEST_F(FilterMultiIndexContainerTests, FilterBooksWithRequestedAuthorList) {
         "Not existed author"
     };
 
-    DataBase::FilterQuery queryAuthors {
-        {BOOK_FILTER_TYPE::Author, authors}
-    };
+    BookFilters bf;
+    filterCreator.withAuthorFilter(bf, authors);
 
-    const auto foundBooks = filter->queryService(queryAuthors);
+    const auto foundBooks = filter->filterService(bf);
 
     uint16_t expecedNumOfFoundBooks {7};
     ASSERT_EQ(foundBooks.size(), expecedNumOfFoundBooks);
@@ -319,12 +318,11 @@ TEST_F(FilterMultiIndexContainerTests, FilterBooksWithRequestedPublicationYearRa
 
     uint16_t minYear {1989};
     uint16_t maxYear {1996};
-    auto publYearData {std::to_string(minYear) + std::to_string(maxYear)};
-    DataBase::FilterQuery queryPublYear {
-        {BOOK_FILTER_TYPE::PublYear, {publYearData}}
-    };
 
-    const auto foundBooks = filter->queryService(queryPublYear);
+    BookFilters bf;
+    filterCreator.withPublicationYearFilter(bf, minYear, maxYear);
+
+    const auto foundBooks = filter->filterService(bf);
 
     uint16_t expecedNumOfFoundBooks {5};
     ASSERT_EQ(foundBooks.size(), expecedNumOfFoundBooks);
@@ -353,12 +351,11 @@ TEST_F(FilterMultiIndexContainerTests, FilterBooksWithMultipleFiltres) {
         "Andrzej Sapkowski"
     };
 
-    DataBase::FilterQuery queryCombined {
-        {BOOK_FILTER_TYPE::Author, authors},
-        {BOOK_FILTER_TYPE::PublYear, {publYearData}}
-    };
+    BookFilters bf;
+    filterCreator.withAuthorFilter(bf, authors);
+    filterCreator.withPublicationYearFilter(bf, minYear, maxYear);
 
-    const auto foundBooks = filter->queryService(queryCombined);
+    const auto foundBooks = filter->filterService(bf);
 
     uint16_t expecedNumOfFoundBooks {5};
     ASSERT_EQ(foundBooks.size(), expecedNumOfFoundBooks);

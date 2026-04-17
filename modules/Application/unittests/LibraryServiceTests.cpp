@@ -32,7 +32,7 @@ protected:
       auto rawMic {mic.get()};
       auto bookRepo = std::make_unique<BookRepository>(
         std::move(mic),
-        std::make_unique<DataBase::FilterMultiIndexedContainer>(rawMic)
+        std::make_unique<DataBase::BookFilteringForMIC>(rawMic)
       );
       libraryService = std::make_unique<LibraryService>(std::move(bookRepo));
   }

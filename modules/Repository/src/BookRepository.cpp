@@ -9,8 +9,8 @@
 
 namespace Repository {
 
-auto BookRepository::filterBooks(DataBase::FilterQuery filterQuery) -> DataBase::FilteredBooks {
-    return m_dataFilter->queryService(std::move(filterQuery));
+auto BookRepository::filterBooks(BookFilters bookFilters) -> DataBase::FilteredBooks {
+    return m_dataFilter->filterService(std::move(bookFilters));
 }
 
 auto BookRepository::addBook(Book book) noexcept -> bool {

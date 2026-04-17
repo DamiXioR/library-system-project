@@ -8,23 +8,16 @@
 #include <memory>
 
 #include "Book.hpp"
+#include "BookFilters.hpp"
 
 namespace DataBase {
 
-enum class BOOK_FILTER_TYPE {
-    NotApplied = 0,
-    Title,
-    Author,
-    PublYear
-};
-
 using FilteredBooks = std::unordered_set<std::weak_ptr<Book>, WeakBookHash, WeakBookEqual>;
-using FilterQuery = std::unordered_map<BOOK_FILTER_TYPE, std::vector<std::string>>;
 
-class IDataContainerFilter {
+class IBookFilteringForMIC {
 public:
-    virtual ~IDataContainerFilter() = default;
-    virtual auto queryService(FilterQuery filterQuery) -> DataBase::FilteredBooks = 0;
+    virtual ~IBookFilteringForMIC() = default;
+    virtual auto filterService(BookFilters bookFilters) -> DataBase::FilteredBooks = 0;
 };
 
 } // namespace DataBase
