@@ -101,18 +101,6 @@ ctest --test-dir build -R RepositoryTests --verbose
 
 If a unit test name is unique among all unit tests, you can use just the first letter of the test name, or the first few letters until they distinguish the test from the others. For example, for __DataModuleTest__ and __DataSuperModuleTest__, you can use __DataM__ and __DataS__.
 
-### Exclude all tests or specyfic tests from configuration
-You can exclude all unit tests from configuration by using a dedicated flag:
-```bash
-cmake -S . -B build -DBUILD_TESTING=OFF
-```
-
-If you do not need to configure specific unit tests, you can exclude them from the build configuration by using a specific flag:
-```bash
-cmake -S . -B build -DBUILD_EXAMPLEMODULE_TESTS=OFF
-```
-You can also specify multiple flags in the same command.
-
 ## Debugging and Dynamic Analysis
 
 For debugging and dynamic analysis the project should be built **without compiler optimizations and with debug symbols enabled**.

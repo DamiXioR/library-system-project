@@ -8,8 +8,9 @@ target_include_directories(TestUtils INTERFACE
 
 target_include_directories(TestUtils INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/mocks
 )
 
 target_link_libraries(TestUtils INTERFACE
-    Domain
+    BookDomain
 )

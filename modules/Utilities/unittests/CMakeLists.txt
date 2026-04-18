@@ -15,4 +15,5 @@ add_test(
     NAME UtilitiesTests
     COMMAND UtilitiesTests
 )
+
 set_tests_properties(UtilitiesTests PROPERTIES ENVIRONMENT "GTEST_COLOR=yes")

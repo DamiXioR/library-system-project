@@ -151,17 +151,18 @@ public:
             .build();
     }
 
-    std::vector<std::shared_ptr<Book>> createWitcherBooks() {
-        return {
-            std::make_shared<Book>(createWitcherTheLastWish()),
-            std::make_shared<Book>(createWitcherSwordOfDestiny()),
-            std::make_shared<Book>(createWitcherBloodOfElves()),
-            std::make_shared<Book>(createWitcherTimeOfContempt()),
-            std::make_shared<Book>(createWitcherBaptismOfFire()),
-            std::make_shared<Book>(createWitcherTowerOfSwallows()),
-            std::make_shared<Book>(createWitcherLadyOfTheLake()),
-            std::make_shared<Book>(createWitcherSeasonOfStorms())
+    std::vector<Book> createWitcherBooks() {
+        std::vector<Book> books {
+            createWitcherTheLastWish(),
+            createWitcherSwordOfDestiny(),
+            createWitcherBloodOfElves(),
+            createWitcherTimeOfContempt(),
+            createWitcherBaptismOfFire(),
+            createWitcherTowerOfSwallows(),
+            createWitcherLadyOfTheLake(),
+            createWitcherSeasonOfStorms()
         };
+        return books;
     }
 
     std::vector<Book> createBooks() {

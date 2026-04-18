@@ -1,18 +1,20 @@
 cmake_minimum_required(VERSION 3.23)
 
+project(LibrarySystem)
+
 set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(MyProgram)
-
 include(CTest)
 
+# =========================
+# DEPENDENCIES
+# =========================
 if(BUILD_TESTING)
     set(BUILD_SHARED_LIBS ON)
     add_subdirectory(vendor/googletest)
 
     add_library(GTestDependencies INTERFACE)
-
     target_link_libraries(GTestDependencies INTERFACE
         GTest::gtest
         GTest::gtest_main
@@ -22,10 +24,16 @@ if(BUILD_TESTING)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
+# =========================
+# APP
+# =========================
 add_subdirectory(app)
-add_subdirectory(modules/Domain)
-add_subdirectory(modules/Repository)
-add_subdirectory(modules/Application)
+
+# =========================
+# MODULES (FEATURES)
+# =========================
+add_subdirectory(modules/Book)
+# add_subdirectory(modules/User)
 add_subdirectory(modules/Utilities)
 
 if(BUILD_TESTING)

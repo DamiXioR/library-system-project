@@ -1,15 +1,12 @@
 # --- Utilities module (library) ---
 
-add_library(Utilities SHARED
-    src/ExampleUtility.cpp
+add_library(Utilities INTERFACE)
+
+target_include_directories(Utilities
+    INTERFACE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_include_directories(Utilities PUBLIC
-    include
-)
-
-option(BUILD_UTILITIES_TESTS "Build Utilities tests" ON)
-
-if(BUILD_TESTING AND BUILD_UTILITIES_TESTS)
+if(BUILD_TESTING)
     add_subdirectory(unittests)
 endif()
