@@ -34,7 +34,8 @@ add_subdirectory(app)
 # =========================
 add_subdirectory(modules/Book)
 # add_subdirectory(modules/User)
-add_subdirectory(modules/Utilities)
+add_subdirectory(modules/Utilities/UuidGenerator)
+add_subdirectory(modules/Utilities/Logger)
 
 if(BUILD_TESTING)
     add_subdirectory(modules/TestUtils)

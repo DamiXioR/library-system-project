@@ -3,16 +3,16 @@
 Clone the repository with hooks: `git clone ...`
 
 For this instruction, let’s assume you keep the repository in this directory:
-`cd /home/${USER}/workspace/good_job_project`
+`cd /home/${USER}/workspace/library_system_project`
 
 # Installing External Dependencies
-good_job_project uses external dependencies like CMake, GTest and GMock framework.
+library_system_project uses external dependencies like CMake, GTest and GMock framework.
 
 ## CMake
 The easiest way to install CMake is to fetch the newest script from the official website.
 Check the latest version here: `http://cmake.org/download/`.
 
-First go to your root repository path: `cd ~/workspace/good_job_project`
+First go to your root repository path: `cd ~/workspace/library_system_project`
 
 As of today, the current version is v.4.2.3. To get the script use the following command:
 `wget https://github.com/Kitware/CMake/releases/download/v4.2.3/cmake-4.2.3-linux-x86_64.sh`
@@ -27,7 +27,7 @@ Verify if binaries are correctly installed:
 `ls cmake-4.2.3-linux-x86_64/bin` especially `ls cmake-4.2.3-linux-x86_64/bin/cmake`
 
 Add CMake binaries to your environment variables:
-`export PATH=$PATH:/home/${USER}/good_job_project/cmake-4.2.3-linux-x86_64/bin`
+`export PATH=$PATH:/home/${USER}/library_system_project/cmake-4.2.3-linux-x86_64/bin`
 This is important if you want to run CMake using the command `cmake` instead of specifying the full path.
 
 ## GTest and GMock [Section should be updated due to change an approach]
@@ -56,6 +56,16 @@ googletest/include/gtest/...
 googlemock/include/gmock/...
 ```
 
+# Load environment variables
+The `.env` file contains all required environment variables used by the application.
+Sourcing it is necessary for the program to work correctly.
+
+To load the environment variables, use:
+
+```bash
+source .env
+```
+
 # Build program with CMake
 Our build system allows the user to build the entire program with unit tests or only a specific module.
 This approach was chosen because orchestration is always beneficial:
@@ -64,14 +74,14 @@ it helps keep the code clean and responsibilities well separated.
 ## Build everything
 To build the entire program with unit tests use the following commands:
 ```bash
-cd ~/workspace/good_job_project/
+cd ~/workspace/library_system_project/
 cmake -S . -B build
 cmake --build build
 ctest --test-dir build --verbose
 ```
 or alternatively and quickly:
 ```bash
-cd ~/workspace/good_job_project/build
+cd ~/workspace/library_system_project/build
 cmake .. && make && ctest --verbose
 ```
 
@@ -113,7 +123,7 @@ Therefore the project should be configured in **Debug mode**, which enables debu
 Configure the project with CMake:
 
 ```bash
-cd ~/workspace/good_job_project/
+cd ~/workspace/library_system_project/
 cmake -DCMAKE_BUILD_TYPE=Debug -S . -B build
 ```
 
