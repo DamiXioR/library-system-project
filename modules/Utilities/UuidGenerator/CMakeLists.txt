@@ -1,8 +1,8 @@
-# --- Utilities module (library) ---
+# --- Utilities module (UuidGenerator) ---
 
-add_library(Utilities INTERFACE)
+add_library(UuidGenerator INTERFACE)
 
-target_include_directories(Utilities
+target_include_directories(UuidGenerator
     INTERFACE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )

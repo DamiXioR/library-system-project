@@ -12,6 +12,12 @@
 #include "BookBuilderHelper.hpp"
 #include "BookFilteringForMultiIndexedContainer.hpp"
 
+/* 
+  Mocks are managed via std::unique_ptr and moved into Logger.
+  Memcheck reports may include false positives due to GoogleTest/GoogleMock
+  internal allocations and teardown behavior.
+*/
+
 using namespace BookHelpers;
 using namespace Repository;
 using namespace ::testing;
@@ -32,14 +38,14 @@ protected:
 };
 
 TEST_F(LibraryServiceTests, AddBookToRepository) {
-  EXPECT_CALL(*bookRepositoryMockHandler, addBook(::testing::_));
+  EXPECT_CALL(*bookRepositoryMockHandler, addBook(_));
 
   const Book wiedzminBook = bookBuilder.createWitcherTheLastWish();
   libraryService->addBook(wiedzminBook);
 }
 
 TEST_F(LibraryServiceTests, FindBookInRepository) {
-  EXPECT_CALL(*bookRepositoryMockHandler, filterBooks(::testing::_));
+  EXPECT_CALL(*bookRepositoryMockHandler, filterBooks(_));
 
   libraryService->filterBooks(BookFilters{});
 
