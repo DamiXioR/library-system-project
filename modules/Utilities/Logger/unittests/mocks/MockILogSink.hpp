@@ -15,7 +15,7 @@ public:
 
     MOCK_METHOD(bool,
                 acceptsChannel,
-                (const std::string& requestedChannel),
+                (std::string_view requestedChannel),
                 (const, override));
 
     MOCK_METHOD(bool,
@@ -25,7 +25,7 @@ public:
 
     MOCK_METHOD(void,
                 execute,
-                (const std::string& finalLog),
+                (std::string_view finalLog),
                 (const, override));
 };
 

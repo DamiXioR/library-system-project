@@ -7,6 +7,7 @@ target_compile_options(MyProgram PRIVATE
 
 target_include_directories(MyProgram PRIVATE
     ${CMAKE_SOURCE_DIR}/modules/Utilities/Logger/include
+    ${CMAKE_SOURCE_DIR}/modules/Utilities/EnvVarFetcher/include
 )
 
 target_link_libraries(MyProgram PRIVATE

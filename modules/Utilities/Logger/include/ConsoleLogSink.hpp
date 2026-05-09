@@ -7,6 +7,7 @@
 #include <cstdint>
 
 #include "ILogSink.hpp"
+#include "LogSinkHelpers.hpp"
 
 namespace LogSys {
 
@@ -28,23 +29,23 @@ public:
         return minLevel;
     }
 
-    auto acceptsChannel(const std::string& requestedChannel) const -> bool override {
+    auto acceptsChannel(std::string_view requestedChannel) const -> bool override {
         return channels.contains(requestedChannel) ||
-            channels.contains("Main");
+            channels.contains(MAIN_CHANNEL);
     }
 
     auto isConsoleLog() const -> bool override { return true; }
 
-    auto execute(const std::string& finalLog) const -> void override {
+    auto execute(std::string_view finalLog) const -> void override {
         printOnScreen(finalLog);
     }
 
 private:
-    auto printOnScreen(const std::string& logMessage) const -> void {
+    auto printOnScreen(std::string_view logMessage) const -> void {
         std::cout << logMessage << "\n";
     }
 
-    std::unordered_set<std::string> channels;
+    std::unordered_set<std::string, TransparentHash, std::equal_to<>> channels;
     LogLevel minLevel;
 };
 

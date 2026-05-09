@@ -78,7 +78,7 @@ private:
         auto now = system_clock::now();
         auto local = current_zone()->to_local(now);
 
-        return std::format("{:%d-%m-%Y %H:%M:%S}", local);
+        return std::format("{:%d-%m-%Y %T}", local);
     }
 
     std::vector<std::unique_ptr<ILogSink>> sinks;

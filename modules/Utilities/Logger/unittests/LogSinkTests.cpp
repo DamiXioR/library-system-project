@@ -1,9 +1,12 @@
 #include <gtest/gtest.h>
 
+#include <chrono>
 #include <memory>
+#include <string_view>
 
 #include "ConsoleLogSink.hpp"
 #include "FileLogSink.hpp"
+#include "EnvVarFetcher.hpp"
 
 using namespace ::testing;
 using namespace LogSys;
@@ -44,12 +47,42 @@ TEST_F(ConsoleLogSinkTests, isConsoleLogShouldReturnTrueOnlyForConsoleLogSink) {
 class FileLogSinkTests : public Test {
 protected:
   void SetUp() override {
+      appCfg = EnvVar::EnvVarFetcher::loadOrThrow();
+
       minLogLevel = LogLevel::Info;
-      logFilePath = {"/path/to/logs/program.log"};
       std::initializer_list<std::string> acceptedChannels = {"Book", "DataBase"};
-      fileLogSink = std::make_unique<FileLogSink>(minLogLevel, logFilePath, acceptedChannels);
+      fileLogSink = std::make_unique<FileLogSink>(appCfg, minLogLevel, appCfg.testLogPath, acceptedChannels);
   }
 
+  std::string getLastLine(std::string pathToFile) {
+    std::string getLastLineCmd {"tail -n 1 " + pathToFile};
+    FILE* pipe = popen(getLastLineCmd.c_str(), "r");
+    
+    uint16_t noOfBytesInBuffer {128};
+    char buffer[noOfBytesInBuffer];
+    std::string result;
+
+    while (fgets(buffer, sizeof(buffer), pipe)) {
+        result += buffer;
+    }
+
+    pclose(pipe);
+
+        while (!result.empty() &&
+          (result.back() == '\n' || result.back() == '\r')) {
+        result.pop_back();
+    }
+
+    return result;
+  }
+
+  std::string getCurrentLocalTime() {
+    const auto now = std::chrono::system_clock::now();
+    const auto locTime = std::chrono::current_zone()->to_local(now);
+    return std::format("{:%d-%m-%Y %T}", locTime);
+  }
+
+  AppCfg::AppConfig appCfg;
   std::unique_ptr<FileLogSink> fileLogSink;
   LogLevel minLogLevel;
   std::string logFilePath;
@@ -57,12 +90,12 @@ protected:
 };
 
 TEST_F(FileLogSinkTests, AcceptsChannelShouldReturnTrueIfChannelExistsForRequestedSinkOrFalseOtherwise) {
-  auto bookChannel {"Book"};
-  auto dataBaseChannel {"DataBase"};
+  const auto bookChannel {"Book"};
+  const auto dataBaseChannel {"DataBase"};
   ASSERT_TRUE(fileLogSink->acceptsChannel(bookChannel));
   ASSERT_TRUE(fileLogSink->acceptsChannel(dataBaseChannel));
 
-  auto notExistedChannel {"HelloWorld"};
+  const auto notExistedChannel {"HelloWorld"};
   ASSERT_FALSE(fileLogSink->acceptsChannel(notExistedChannel));
 }
 
@@ -77,5 +110,18 @@ TEST_F(FileLogSinkTests, isConsoleLogShouldReturnTrueOnlyForConsoleLogSink) {
 }
 
 TEST_F(FileLogSinkTests, executeShouldWriteLogIntoFilePath) {
-  fileLogSink->execute("test");
+    const auto timeOfLatestLog {getCurrentLocalTime()};
+    std::string exampleLog {"[INFO][Book][" + timeOfLatestLog + "][./app/main.cpp:777] Hello World!"};
+
+    fileLogSink->execute(exampleLog);
+    std::string lastLog {getLastLine(appCfg.testLogPath)};
+
+    ASSERT_EQ(lastLog, exampleLog);
+}
+
+TEST_F(FileLogSinkTests, executeShouldHandleExternalPathGracefully) {
+  const std::string exampleExtPath {"/home/user/some/place/for/logs/log.log"};
+  const auto fileLogSinkWithExternalLogPath = std::make_unique<FileLogSink>(appCfg, minLogLevel, exampleExtPath, acceptedChannels);
+  std::string exampleLog {"test"};
+  ASSERT_NO_THROW(fileLogSinkWithExternalLogPath->execute(exampleLog));
 }
