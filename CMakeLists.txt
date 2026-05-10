@@ -37,6 +37,7 @@ add_subdirectory(modules/Book)
 add_subdirectory(modules/Utilities/UuidGenerator)
 add_subdirectory(modules/Utilities/Logger)
 add_subdirectory(modules/Utilities/EnvVarFetcher)
+add_subdirectory(modules/Utilities/ThreadPool)
 
 if(BUILD_TESTING)
     add_subdirectory(modules/TestUtils)
