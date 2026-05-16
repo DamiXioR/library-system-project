@@ -1,5 +1,5 @@
-#ifndef I_DATA_CONTAINER_FILTER_CREATOR_HPP
-#define I_DATA_CONTAINER_FILTER_CREATOR_HPP
+#ifndef IDATA_CONTAINER_FILTER_CREATOR_HPP
+#define IDATA_CONTAINER_FILTER_CREATOR_HPP
 
 #include <unordered_map>
 #include <unordered_set>
@@ -23,6 +23,6 @@ public:
     virtual auto withPublicationYearFilter(BookFilters& bookFilters, uint16_t minYear, uint16_t maxYear) -> void = 0;
 };
 
-} // namespace DataBase
+} // namespace BookFiltering
 
-#endif // I_DATA_CONTAINER_FILTER_CREATOR_HPP
+#endif // IDATA_CONTAINER_FILTER_CREATOR_HPP

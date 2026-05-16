@@ -24,7 +24,7 @@ public:
     {}
 
     auto addBook(Book book) noexcept -> bool override;
-    auto removeBook(const BookId& bookId) noexcept -> bool override;
+    auto removeBook(const BookId& bookId) -> bool override;
     auto getNumOfBooks() const noexcept -> size_t override;
 
     auto filterBooks(BookFilters bookFilters) -> FilterResults override;

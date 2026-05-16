@@ -72,41 +72,40 @@ public:
         FilterResults filterResults;
         auto isPrimaryContainerUsed {false};
 
-        if(auto& [isTitleFilterApplied, titles] = bookFilters.titleFilter; isTitleFilterApplied){
-            filterResults = fitlerTextIndexedContainer(m_micForFilter->getTitleIndex(), titles);
-            isTitleFilterApplied = false;
+        if(!bookFilters.titleFilter.empty()){
+            filterResults = fitlerTextIndexedContainer(m_micForFilter->getTitleIndex(), bookFilters.titleFilter);
             isPrimaryContainerUsed = true;
         }
-        if(auto& [isAuthorFilterApplied, authors] = bookFilters.authorFilter; isAuthorFilterApplied && !isPrimaryContainerUsed){
-            filterResults = fitlerTextIndexedContainer(m_micForFilter->getAuthorIndex(), authors);
-            isAuthorFilterApplied = false;
+        if(!bookFilters.authorFilter.empty() && !isPrimaryContainerUsed){
+            filterResults = fitlerTextIndexedContainer(m_micForFilter->getAuthorIndex(), bookFilters.authorFilter);
             isPrimaryContainerUsed = true;
             
         }
-        if(auto& [isPubYearFilterApplied, yearRange] = bookFilters.pYearFilter; isPubYearFilterApplied && !isPrimaryContainerUsed){
-            filterResults = filterNumIndexedContainer(m_micForFilter->getYearIndex(), yearRange.first, yearRange.second);
-            isPubYearFilterApplied = false;
+        if(bookFilters.pYearFilter.has_value() && !isPrimaryContainerUsed){
+            const auto& publYear {bookFilters.pYearFilter.value()};
+            filterResults = filterNumIndexedContainer(m_micForFilter->getYearIndex(), publYear.minYear, publYear.maxYear);
             isPrimaryContainerUsed = true;
         }
 
         auto makeEqualityFilter = [](auto filter, auto getter) -> auto {
             return [filter, getter](const auto& weakBook) -> bool {
-                if (!filter.first) return true;
+                if (filter.empty()) return true;
 
                 auto book = weakBook.lock();
                 if (!book) return false;
 
-                return std::ranges::any_of(filter.second, [&](const auto& v) {
+                return std::ranges::any_of(filter, [&](const auto& v) {
                     return getter(book) == v;
                 });
             };
         };
 
         auto usePublYearFilter = [&bookFilters](auto& weekBook) -> bool {
-            if(auto [isPubYearFilterApplied, yearRange] = bookFilters.pYearFilter; isPubYearFilterApplied){
+            if(bookFilters.pYearFilter.has_value()){
+                const auto& publYear {bookFilters.pYearFilter.value()};
                 auto book {weekBook.lock()};
                 if (!book) return false;
-                if(book->getPublicationYear() >= yearRange.first && book->getPublicationYear() <= yearRange.second){
+                if(book->getPublicationYear() >= publYear.minYear && book->getPublicationYear() <= publYear.maxYear){
                         return true;
                 }
                 return false; 

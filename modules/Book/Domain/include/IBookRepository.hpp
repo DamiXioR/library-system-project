@@ -17,7 +17,7 @@ class IBookRepository {
 public:
     virtual ~IBookRepository() = default;
     virtual auto addBook(Book book) noexcept -> bool = 0;
-    virtual auto removeBook(const BookId& bookId) noexcept -> bool = 0;
+    virtual auto removeBook(const BookId& bookId) -> bool = 0;
     virtual auto getNumOfBooks() const noexcept -> size_t = 0;
     
     virtual auto filterBooks(BookFilters bookFilters) -> FilterResults = 0;

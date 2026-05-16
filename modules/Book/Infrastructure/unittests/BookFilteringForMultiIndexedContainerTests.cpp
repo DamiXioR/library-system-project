@@ -54,7 +54,7 @@ TEST_F(BookFilteringForMultiIndexedContainerTests, FilterStartReplacesPreviousMi
     };
 
     BookFilters bf;
-    bf.titleFilter = {true, std::vector<std::string>(titles)};
+    bf.titleFilter = titles;
 
     const auto foundBooks = filter->filterService(bf);
     uint16_t expecedNumOfFoundBooks {2};
@@ -88,7 +88,7 @@ TEST_F(BookFilteringForMultiIndexedContainerTests, FilterBooksWithRequestedTitle
     };
 
     BookFilters bf;
-    bf.titleFilter = {true, std::vector<std::string>(titles)};
+    bf.titleFilter = titles;
 
     const auto foundBooks = filter->filterService(bf);
 
@@ -121,7 +121,7 @@ TEST_F(BookFilteringForMultiIndexedContainerTests, FilterBooksWithRequestedAutho
     };
 
     BookFilters bf;
-    bf.authorFilter = {true, std::vector<std::string>(authors)};
+    bf.authorFilter = authors;
 
     const auto foundBooks = filter->filterService(bf);
 
@@ -148,7 +148,7 @@ TEST_F(BookFilteringForMultiIndexedContainerTests, FilterBooksWithRequestedPubli
     uint16_t maxYear {1996};
 
     BookFilters bf;
-    bf.pYearFilter = {true, {minYear, maxYear}};
+    bf.pYearFilter = {minYear, maxYear};
 
     const auto foundBooks = filter->filterService(bf);
 
@@ -173,7 +173,7 @@ TEST_F(BookFilteringForMultiIndexedContainerTests, FilterBooksWithFilter) {
             Only one Hyperion in books
         */
         BookFilters bf;
-        bf.titleFilter = {true, {"Hyperion"}};
+        bf.titleFilter = {"Hyperion"};
 
         auto filterResults {filter->filterService(bf)};
         auto& filteredBooks {filterResults.m_books};
@@ -192,7 +192,7 @@ TEST_F(BookFilteringForMultiIndexedContainerTests, FilterBooksWithFilter) {
         */
 
         BookFilters bf;
-        bf.authorFilter = {true, {"Andrzej Sapkowski"}};
+        bf.authorFilter = {"Andrzej Sapkowski"};
 
         auto filterResults {filter->filterService(bf)};
         auto& filteredBooks {filterResults.m_books};
@@ -217,7 +217,7 @@ TEST_F(BookFilteringForMultiIndexedContainerTests, FilterBooksWithFilter) {
         uint16_t maxYear {1996};
 
         BookFilters bf;
-        bf.pYearFilter = {true, {minYear, maxYear}};
+        bf.pYearFilter = {minYear, maxYear};
 
         auto filterResults {filter->filterService(bf)};
         auto& filteredBooks {filterResults.m_books};
@@ -258,8 +258,8 @@ TEST_F(BookFilteringForMultiIndexedContainerTests, FilterBooksWithMultipleFiltre
     };
 
     BookFilters bf;
-    bf.authorFilter = {true, std::vector<std::string>(authors)};
-    bf.pYearFilter = {true, {minYear, maxYear}};
+    bf.authorFilter = authors;
+    bf.pYearFilter = {minYear, maxYear};
 
     const auto foundBooks = filter->filterService(bf);
 

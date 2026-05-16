@@ -33,7 +33,7 @@ public:
     auto setTitle(const std::string& title) -> void {
         m_title = title;
     }
-    auto setPublicationYear(const uint16_t publicationYear) -> void {
+    auto setPublicationYear(const std::optional<uint16_t>& publicationYear) -> void {
         m_publicationYear = publicationYear;
     }
 

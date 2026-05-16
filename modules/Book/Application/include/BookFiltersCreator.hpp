@@ -14,16 +14,16 @@ class BookFiltersCreator : IBookFiltersCreator {
 public:
     BookFiltersCreator() = default;
 
-    auto withTitleFilter(BookFilters& bookFilters, std::vector<std::string> titles) -> void {
-        bookFilters.titleFilter = std::make_pair(true, titles);
+    auto withTitleFilter(BookFilters& bookFilters, const std::vector<std::string>& titles) -> void {
+        bookFilters.titleFilter = std::move(titles);
     }
 
-    auto withAuthorFilter(BookFilters& bookFilters, std::vector<std::string> authors) -> void {
-        bookFilters.authorFilter = std::make_pair(true, authors);
+    auto withAuthorFilter(BookFilters& bookFilters, const std::vector<std::string>& authors) -> void {
+        bookFilters.authorFilter = std::move(authors);
     }
 
     auto withPublicationYearFilter(BookFilters& bookFilters, uint16_t minYear, uint16_t maxYear) -> void {
-        bookFilters.pYearFilter = std::make_pair(true, std::make_pair(minYear, maxYear));
+        bookFilters.pYearFilter = std::make_optional(PublYear{minYear, maxYear});
     }
 };
 

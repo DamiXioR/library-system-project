@@ -9,6 +9,8 @@
 #include "BookId.hpp"
 #include "MockIBookRepository.hpp"
 #include "LibraryService.hpp"
+#include "AddBookCommand.hpp"
+#include "RemoveBookCommand.hpp"
 #include "BookBuilderHelper.hpp"
 #include "BookFilteringForMultiIndexedContainer.hpp"
 
@@ -21,6 +23,8 @@
 using namespace BookHelpers;
 using namespace Repository;
 using namespace ::testing;
+
+using namespace Actions;
 
 class LibraryServiceTests : public Test {
 
@@ -40,8 +44,12 @@ protected:
 TEST_F(LibraryServiceTests, AddBookToRepository) {
   EXPECT_CALL(*bookRepositoryMockHandler, addBook(_));
 
-  const Book wiedzminBook = bookBuilder.createWitcherTheLastWish();
-  libraryService->addBook(wiedzminBook);
+  const AddBookCommand addBookCommand {
+    .m_title = "The Witcher: The Last Wish",
+    .m_author = "Andrzej Sapkowski"
+  };
+
+  libraryService->addBook(addBookCommand);
 }
 
 TEST_F(LibraryServiceTests, FindBookInRepository) {
@@ -52,6 +60,17 @@ TEST_F(LibraryServiceTests, FindBookInRepository) {
 }
 
 TEST_F(LibraryServiceTests, RemoveBookFromRepository) {
+  EXPECT_CALL(*bookRepositoryMockHandler, removeBook(_));
+
+  const BookId bookId {"123"};
+  const RemoveBookCommand removeBookCommand {
+    .m_bookId = bookId
+  };
+
+  libraryService->removeBook(removeBookCommand);
+}
+
+TEST_F(LibraryServiceTests, GetNumOfBooksInRepository) {
   EXPECT_CALL(*bookRepositoryMockHandler, getNumOfBooks());
 
   libraryService->getNumOfBooks();

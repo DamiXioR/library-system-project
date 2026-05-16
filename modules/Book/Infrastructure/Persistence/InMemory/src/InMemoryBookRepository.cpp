@@ -13,7 +13,7 @@ auto InMemoryBookRepository::addBook(Book book) noexcept -> bool {
     return m_dataContainer->addBook(book);
 }
 
-auto InMemoryBookRepository::removeBook(const BookId& bookId) noexcept -> bool {
+auto InMemoryBookRepository::removeBook(const BookId& bookId) -> bool {
     return m_dataContainer->removeBook(bookId);
 }
 

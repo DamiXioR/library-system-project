@@ -3,14 +3,18 @@
 
 #include <vector>
 #include <string>
-#include <functional>
 #include <cstdint>
+#include <optional>
 
-class BookFilters {
-public:
-    std::pair<bool, std::vector<std::string>> titleFilter;
-    std::pair<bool, std::vector<std::string>> authorFilter;
-    std::pair<bool, std::pair<uint16_t, uint16_t>> pYearFilter;
+struct PublYear {
+    uint16_t minYear;
+    uint16_t maxYear;
+};
+
+struct BookFilters {
+    std::vector<std::string> titleFilter;
+    std::vector<std::string> authorFilter;
+    std::optional<PublYear> pYearFilter;
 };
 
 #endif // BOOK_FILTERS_HPP
