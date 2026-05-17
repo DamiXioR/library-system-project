@@ -24,6 +24,8 @@ if(BUILD_TESTING)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
+# nlohmann_json::nlohmann_json is header-only, so we can use it as an INTERFACE library
+
 # =========================
 # APP
 # =========================

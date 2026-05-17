@@ -56,6 +56,21 @@ googletest/include/gtest/...
 googlemock/include/gmock/...
 ```
 
+The GoogleTest repository should be kept in `./vendor/googletest/`
+
+# nlohmann json
+Project uses 3PP json parser.
+
+The actual latest version of nlohmann json parser should be available under these links:
+```bash
+wget https://github.com/nlohmann/json/releases/download/v3.12.0/json.hpp
+wget https://github.com/nlohmann/json/releases/download/v3.12.0/json_fwd.hpp
+```
+
+You can verify latest version on `https://github.com/nlohmann/json/releases`.
+
+Place `json.hpp` and `json_fwd.hpp` directly in `./vendor/nlohmann_json/`.
+
 # Load environment variables
 The `.env` file contains all required environment variables used by the application.
 Sourcing it is necessary for the program to work correctly.
