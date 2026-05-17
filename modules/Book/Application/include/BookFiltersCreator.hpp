@@ -22,8 +22,8 @@ public:
         bookFilters.authorFilter = std::move(authors);
     }
 
-    auto withPublicationYearFilter(BookFilters& bookFilters, uint16_t minYear, uint16_t maxYear) -> void {
-        bookFilters.pYearFilter = std::make_optional(PublYear{minYear, maxYear});
+    auto withPublicationYearFilter(BookFilters& bookFilters, const PublYear& publYear) -> void {
+        bookFilters.pYearFilter = std::make_optional(publYear);
     }
 };
 

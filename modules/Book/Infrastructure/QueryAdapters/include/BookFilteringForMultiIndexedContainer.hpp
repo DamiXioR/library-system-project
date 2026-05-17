@@ -87,46 +87,55 @@ public:
             isPrimaryContainerUsed = true;
         }
 
-        auto makeEqualityFilter = [](auto filter, auto getter) -> auto {
-            return [filter, getter](const auto& weakBook) -> bool {
-                if (filter.empty()) return true;
+       auto matchesTitle = [&](const auto& weakBook) {
+            if (bookFilters.titleFilter.empty())
+                return true;
 
-                auto book = weakBook.lock();
-                if (!book) return false;
+            auto book = weakBook.lock();
+            if (!book)
+                return false;
 
-                return std::ranges::any_of(filter, [&](const auto& v) {
-                    return getter(book) == v;
-                });
-            };
-        };
-
-        auto usePublYearFilter = [&bookFilters](auto& weekBook) -> bool {
-            if(bookFilters.pYearFilter.has_value()){
-                const auto& publYear {bookFilters.pYearFilter.value()};
-                auto book {weekBook.lock()};
-                if (!book) return false;
-                if(book->getPublicationYear() >= publYear.minYear && book->getPublicationYear() <= publYear.maxYear){
-                        return true;
-                }
-                return false; 
-            }
-            return true;
-        };
-
-        auto result =
-            filterResults.m_books
-            | std::views::filter(makeEqualityFilter(
+            return std::ranges::contains(
                 bookFilters.titleFilter,
-                [](const auto& b) -> const auto& { return b->getTitle(); }
-            ))
-            | std::views::filter(makeEqualityFilter(
-                bookFilters.authorFilter,
-                [](const auto& b) -> const auto& { return b->getAuthor(); }
-            ))
-            | std::views::filter(usePublYearFilter)
-            | std::ranges::to<decltype(filterResults.m_books)>();
+                book->getTitle()
+            );
+        };
 
-        filterResults.m_books = std::move(result);
+        auto matchesAuthor = [&](const auto& weakBook) {
+            if (bookFilters.authorFilter.empty())
+                return true;
+
+            auto book = weakBook.lock();
+            if (!book)
+                return false;
+
+            return std::ranges::contains(
+                bookFilters.authorFilter,
+                book->getAuthor()
+            );
+        };
+
+        auto matchesPublicationYear = [&](const auto& weakBook) {
+            if (!bookFilters.pYearFilter.has_value())
+                return true;
+
+            auto book = weakBook.lock();
+            if (!book)
+                return false;
+
+            const auto& yearFilter = bookFilters.pYearFilter.value();
+            const auto year = book->getPublicationYear();
+
+            return year >= yearFilter.minYear
+                && year <= yearFilter.maxYear;
+        };
+
+        filterResults.m_books =
+            filterResults.m_books
+            | std::views::filter(matchesTitle)
+            | std::views::filter(matchesAuthor)
+            | std::views::filter(matchesPublicationYear)
+            | std::ranges::to<decltype(filterResults.m_books)>();
 
         return filterResults;
     }

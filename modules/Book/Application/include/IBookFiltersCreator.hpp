@@ -18,9 +18,9 @@ class IBookFiltersCreator {
 public:
     virtual ~IBookFiltersCreator() = default;
 
-    virtual auto withTitleFilter(BookFilters& bookFilters, std::vector<std::string> titles) -> void = 0;
-    virtual auto withAuthorFilter(BookFilters& bookFilters, std::vector<std::string> authors) -> void = 0;
-    virtual auto withPublicationYearFilter(BookFilters& bookFilters, uint16_t minYear, uint16_t maxYear) -> void = 0;
+    virtual auto withTitleFilter(BookFilters& bookFilters, const std::vector<std::string>& titles) -> void = 0;
+    virtual auto withAuthorFilter(BookFilters& bookFilters, const std::vector<std::string>& authors) -> void = 0;
+    virtual auto withPublicationYearFilter(BookFilters& bookFilters, const PublYear& publYear) -> void = 0;
 };
 
 } // namespace BookFiltering
