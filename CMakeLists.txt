@@ -34,6 +34,7 @@ add_subdirectory(app)
 # =========================
 # MODULES (FEATURES)
 # =========================
+add_subdirectory(modules/Api)
 add_subdirectory(modules/Book)
 # add_subdirectory(modules/User)
 add_subdirectory(modules/Utilities/UuidGenerator)
