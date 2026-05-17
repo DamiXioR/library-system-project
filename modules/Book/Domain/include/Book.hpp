@@ -12,9 +12,9 @@
 class Book {
 public:
     Book(BookId bookId, std::string author, std::string title) noexcept 
-        : m_bookId(bookId), 
-          m_author(author), 
-          m_title(title) {};
+        : m_bookId(std::move(bookId)),
+        m_author(std::move(author)),
+        m_title(std::move(title)) {}
 
     Book(const Book& other) noexcept = default;
 

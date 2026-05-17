@@ -11,24 +11,21 @@
 #include <unordered_set>
 #include <expected>
 
-enum class UUID_ERROR_CODE {
-    DUPLICATE_LIMIT_REACHED,
-    INVALID_UUID
-};
+#include "IUuidGenerator.hpp"
 
 template <class UuidForType>
-class UuidGenerator {
+class UuidGenerator : public IUuidGenerator {
 public:
     using uuidUnorderedSet = std::unordered_set<std::string>;
 
     [[nodiscard]]
-    static auto createUuid() -> std::expected<std::string, UUID_ERROR_CODE> {
+    auto generate() -> std::expected<std::string, UUID_ERROR_CODE> {
         bool successfullyInserted {false};
         uint16_t remainingAttempts  {10};
         std::string createdUuid {};
 
         do {
-            auto uuid = generateUUID();
+            auto uuid = createUuid();
             auto [itToInsertedElement, isSuccess] = uuids.emplace(std::string(uuid));
             if (isSuccess){
                 successfullyInserted = isSuccess;
@@ -43,8 +40,8 @@ public:
         return createdUuid;
     }
 
-    static auto getUuids() -> uuidUnorderedSet const {
-        return uuids;
+    auto getUuidsCount() const -> std::size_t override{
+        return uuids.size();
     }
 
 private:
@@ -56,7 +53,7 @@ private:
 
     using uuidBuffor = std::array<uint32_t, MULTIPLICATION_OF_32_BITS>;
 
-    static auto toStringRFC4122(uuidBuffor& data) -> std::string {
+    auto toStringRFC4122(uuidBuffor& data) -> std::string {
         std::stringstream ss;
 
         ss << std::hex << std::setfill('0');
@@ -70,8 +67,8 @@ private:
         return ss.str();
     }
 
-    static auto generateUUID() -> std::string {
-        static thread_local std::mt19937 gen(std::random_device{}());
+    auto createUuid() -> std::string {
+        thread_local std::mt19937 gen(std::random_device{}());
         std::uniform_int_distribution<uint32_t> dist(0, 0xFFFFFFFF);
 
         uuidBuffor data;
@@ -85,7 +82,7 @@ private:
         return toStringRFC4122(data);
     }
 
-    inline static uuidUnorderedSet uuids;
+    uuidUnorderedSet uuids;
 };
 
 #endif // UUID_GENERATOR_HPP

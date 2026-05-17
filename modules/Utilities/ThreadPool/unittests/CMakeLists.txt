@@ -9,7 +9,6 @@ add_executable(ThreadPoolTests
 target_include_directories(ThreadPoolTests
     PRIVATE
         ${CMAKE_SOURCE_DIR}/modules/Utilities/Logger/unittests/mocks
-        ${CMAKE_CURRENT_SOURCE_DIR}/mocks
 )
 
 target_link_libraries(ThreadPoolTests PRIVATE

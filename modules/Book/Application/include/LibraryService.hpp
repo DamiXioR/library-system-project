@@ -11,15 +11,27 @@
 #include "RemoveBookCommand.hpp"
 #include "BookFilters.hpp"
 #include "FilterResults.hpp"
+#include "IUuidGenerator.hpp"
+#include "BookId.hpp"
 
 class LibraryService {
 public:
-    explicit LibraryService(std::unique_ptr<Repository::IBookRepository> bookRepo)
-        : m_BookRepo(std::move(bookRepo)) {}
-
+    explicit LibraryService(
+        std::unique_ptr<Repository::IBookRepository> repo,
+        IUuidGenerator& uuidGenerator
+    )
+        : m_BookRepo(std::move(repo))
+        , m_UuidGenerator(uuidGenerator)
+    {}
     auto addBook(const Actions::AddBookCommand& addBookCommand) -> bool {
+        auto uuid {m_UuidGenerator.generate()};
+        if(!uuid.has_value()){
+            return false;
+        }
+
+        BookId bookId {std::move(uuid.value())};
         Book book {
-            BookId(std::string{"123"}),
+            bookId,
             addBookCommand.m_title,
             addBookCommand.m_author
         };
@@ -44,6 +56,7 @@ public:
 
 private:
     std::unique_ptr<Repository::IBookRepository> m_BookRepo;
+    IUuidGenerator& m_UuidGenerator;
 };
 
 #endif // LIBRARY_SERVICE_HPP

@@ -6,6 +6,12 @@ add_executable(BookApplicationTests
     ${TEST_SRC_FILES}
 )
 
+target_include_directories(BookApplicationTests
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}/modules/TestUtils/mocks
+        ${CMAKE_SOURCE_DIR}/modules/Utilities/UuidGenerator/unittests/mocks
+)
+
 target_link_libraries(BookApplicationTests
     PRIVATE
         GTestDependencies

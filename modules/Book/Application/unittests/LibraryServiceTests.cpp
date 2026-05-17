@@ -13,6 +13,7 @@
 #include "RemoveBookCommand.hpp"
 #include "BookBuilderHelper.hpp"
 #include "BookFilteringForMultiIndexedContainer.hpp"
+#include "MockIUuidGenerator.hpp"
 
 /* 
   Mocks are managed via std::unique_ptr and moved into Logger.
@@ -31,7 +32,7 @@ class LibraryServiceTests : public Test {
   void SetUp() override {
       bookRepositoryMock = std::make_unique<testing::NiceMock<Repository::MockIBookRepository>>();
       bookRepositoryMockHandler = bookRepositoryMock.get();
-      libraryService = std::make_unique<LibraryService>(std::move(bookRepositoryMock));
+      libraryService = std::make_unique<LibraryService>(std::move(bookRepositoryMock), uuidGeneratorMock);
   }
 
 protected:
@@ -39,6 +40,7 @@ protected:
   std::unique_ptr<LibraryService> libraryService;
   std::unique_ptr<NiceMock<MockIBookRepository>> bookRepositoryMock;
   NiceMock<MockIBookRepository>* bookRepositoryMockHandler;
+  StrictMock<MockIUuidGenerator> uuidGeneratorMock;
 };
 
 TEST_F(LibraryServiceTests, AddBookToRepository) {
@@ -49,6 +51,7 @@ TEST_F(LibraryServiceTests, AddBookToRepository) {
     .m_author = "Andrzej Sapkowski"
   };
 
+  EXPECT_CALL(uuidGeneratorMock, generate());
   libraryService->addBook(addBookCommand);
 }
 

@@ -6,11 +6,6 @@ add_executable(EnvVarFetcherTests
     ${TEST_SRC_FILES}
 )
 
-target_include_directories(EnvVarFetcherTests
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/mocks
-)
-
 target_link_libraries(EnvVarFetcherTests PRIVATE
     GTestDependencies
     EnvVarFetcher

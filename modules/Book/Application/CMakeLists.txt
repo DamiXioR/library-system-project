@@ -9,6 +9,7 @@ add_library(BookApplication
 
 target_include_directories(BookApplication
     PUBLIC
+        ${CMAKE_SOURCE_DIR}/modules/Utilities/UuidGenerator/include
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 

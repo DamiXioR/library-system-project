@@ -45,13 +45,14 @@ protected:
       return true;
   }
 
-  struct BookIdFake{};
-  struct LoanIdFake{};
+  struct BookIdTest{};
+  struct LoanIdTest{};
 };
 
 
 TEST_P(UuidGeneratorTests, GeneratesUuidWithCorrectRfc4122V4Format) {
-  const auto uuid = UuidGenerator<BookIdFake>::createUuid();
+  UuidGenerator<BookIdTest> m_uuidGenerator;
+  const auto uuid = m_uuidGenerator.generate();
   if(uuid.has_value()){
     ASSERT_TRUE(validateUuidV4(*uuid));
   }
@@ -64,22 +65,24 @@ INSTANTIATE_TEST_SUITE_P(
 );
 
 TEST_F(UuidGeneratorTests, GeneratorWorksForDifferentTypes) {
-  (void) UuidGenerator<BookIdFake>::createUuid();
-  (void) UuidGenerator<BookIdFake>::createUuid();
+  UuidGenerator<BookIdTest> uuidGenerator;
+  (void) uuidGenerator.generate();
+  (void) uuidGenerator.generate();
   uint16_t expectedNumOfBookUuids {2};
-  ASSERT_EQ(UuidGenerator<BookIdFake>::getUuids().size(), expectedNumOfBookUuids);
+  ASSERT_EQ(uuidGenerator.getUuidsCount(), expectedNumOfBookUuids);
 
-  (void) UuidGenerator<LoanIdFake>::createUuid();
+  UuidGenerator<LoanIdTest> uuidGeneratorLoan;
+  (void) uuidGeneratorLoan.generate();
   uint16_t expectedNumOfLoanUuids {1};
-  ASSERT_EQ(UuidGenerator<LoanIdFake>::getUuids().size(), expectedNumOfLoanUuids);
+  ASSERT_EQ(uuidGeneratorLoan.getUuidsCount(), expectedNumOfLoanUuids);
 
-  (void) UuidGenerator<LoanIdFake>::createUuid();
-  (void) UuidGenerator<LoanIdFake>::createUuid();
-  (void) UuidGenerator<LoanIdFake>::createUuid();
+  (void) uuidGeneratorLoan.generate();
+  (void) uuidGeneratorLoan.generate();
+  (void) uuidGeneratorLoan.generate();
   expectedNumOfLoanUuids = 4;
-  ASSERT_EQ(UuidGenerator<LoanIdFake>::getUuids().size(), expectedNumOfLoanUuids);
+  ASSERT_EQ(uuidGeneratorLoan.getUuidsCount(), expectedNumOfLoanUuids);
 
-  (void) UuidGenerator<BookIdFake>::createUuid();
+  (void) uuidGenerator.generate();
   expectedNumOfBookUuids = 3;
-  ASSERT_EQ(UuidGenerator<BookIdFake>::getUuids().size(), expectedNumOfBookUuids);
+  ASSERT_EQ(uuidGenerator.getUuidsCount(), expectedNumOfBookUuids);
 }
