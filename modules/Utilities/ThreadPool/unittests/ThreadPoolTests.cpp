@@ -1,4 +1,9 @@
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
+
+#include <chrono>
+#include <future>
+#include <memory>
 
 #include "ThreadPool.hpp"
 #include "MockILogger.hpp"
@@ -14,16 +19,19 @@ protected:
     threadPool = std::make_unique<ThreadPool>(mockILogger, countOfThreads);
   }
 
-  NiceMock<LogSys::MockILogger> mockILogger;
+  LogSys::MockILogger mockILogger;
   std::unique_ptr<ThreadPool> threadPool;
 };
 
-TEST_F(ThreadPoolTests, ToDo) {
-    bool taskExecuted {false};
-    threadPool->addTask([&taskExecuted](){
-        taskExecuted = true;
+TEST_F(ThreadPoolTests, TaskShouldBeExecutedInThreadPool) {
+    using namespace std::chrono_literals;
+    std::promise<void> promise;
+    auto future = promise.get_future();
+
+    threadPool->addTask([&promise]() {
+        promise.set_value();
     });
-    float waitForTaskInSec {0.1};
-    sleep(waitForTaskInSec);
-    ASSERT_TRUE(taskExecuted);
+
+    ASSERT_EQ(future.wait_for(1s),
+              std::future_status::ready);
 }
